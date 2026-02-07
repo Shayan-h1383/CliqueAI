@@ -31,13 +31,6 @@
             >
               Suggestions
             </router-link>
-            <router-link
-              v-if="authStore.isAuthenticated"
-              to="/invitations"
-              class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
-            >
-              Invitations
-            </router-link>
             <Button
               v-if="authStore.isAuthenticated"
               variant="outline"
@@ -99,14 +92,6 @@
             @click="mobileMenuOpen = false"
           >
             Suggestions
-          </router-link>
-          <router-link
-            v-if="authStore.isAuthenticated"
-            to="/invitations"
-            class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium"
-            @click="mobileMenuOpen = false"
-          >
-            Invitations
           </router-link>
           <button
             v-if="authStore.isAuthenticated"

@@ -83,19 +83,7 @@
                 >
                   <div class="flex-1 min-w-0">
                     <div class="flex items-center gap-2 flex-wrap">
-                      <img
-                        v-if="link.profile_pic_url"
-                        :src="link.profile_pic_url"
-                        alt=""
-                        class="w-10 h-10 rounded-full object-cover"
-                      />
-                      <div
-                        v-else
-                        class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold"
-                      >
-                        {{ (link.username || '?')[0].toUpperCase() }}
-                      </div>
-                      <span class="font-semibold text-gray-800">{{ link.username || 'Unknown' }}</span>
+                      <span class="font-semibold text-gray-800">Suggestion</span>
                       <span class="text-sm text-primary font-medium">{{ Math.round((link.similarity_score || 0) * 100) }}% match</span>
                     </div>
                     <div v-if="link.payload" class="mt-2 p-3 rounded bg-gray-50 text-sm text-gray-700 space-y-1">
@@ -136,7 +124,7 @@
                           type="button"
                           class="p-2 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
                           :disabled="loadingRespond === linkKey(link)"
-                          :aria-label="'Accept ' + (link.username || 'suggestion')"
+                          aria-label="Accept suggestion"
                           @click="respond(app, link, true)"
                         >
                           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
@@ -148,7 +136,7 @@
                           type="button"
                           class="p-2 rounded-lg font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-50"
                           :disabled="loadingRespond === linkKey(link)"
-                          :aria-label="'Reject ' + (link.username || 'suggestion')"
+                          aria-label="Reject suggestion"
                           @click="respond(app, link, false)"
                         >
                           <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
