@@ -88,14 +88,14 @@ def test_full_flow_register_find_create_pod_send_messages_leave(
         assert 'icebreaker' in pod_data
         pod_id = pod_data['pod']['_id']
     
-    # Step 5: Verify all users have active pod
+    # Step 5: Verify all users have active pod (active_pod_id may be ObjectId or str)
     user1 = user_model.find_by_id(user1_id)
     user2 = user_model.find_by_id(user2_id)
     user3 = user_model.find_by_id(user3_id)
     
-    assert user1.get('active_pod_id') == pod_id
-    assert user2.get('active_pod_id') == pod_id
-    assert user3.get('active_pod_id') == pod_id
+    assert str(user1.get('active_pod_id')) == str(pod_id)
+    assert str(user2.get('active_pod_id')) == str(pod_id)
+    assert str(user3.get('active_pod_id')) == str(pod_id)
     
     # Step 6: Send messages
     response = client.post('/api/messages/send',
@@ -145,7 +145,9 @@ def test_full_flow_register_find_create_pod_send_messages_leave(
     # Verify pod still exists but user1 is removed from members
     pod_model = Pod()
     pod = pod_model.find_by_id(pod_id)
-    assert user1_id not in pod.get('members', [])
+    members = pod.get('members', [])
+    member_strs = [str(m) for m in members]
+    assert user1_id not in member_strs
 
 
 def test_pod_expiration_flow(client: FlaskClient, test_db, sample_user_data,

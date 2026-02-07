@@ -30,7 +30,8 @@ class GeminiService:
         genai.configure(api_key=self.api_key)
         
         # Initialize models
-        self.embedding_model = "models/embedding-001"
+        # embedding-001 was deprecated; use gemini-embedding-001
+        self.embedding_model = "models/gemini-embedding-001"
         self.chat_model = "gemini-1.5-pro"
     
     def get_embedding(self, text: str) -> List[float]:
@@ -52,7 +53,8 @@ class GeminiService:
         try:
             result = genai.embed_content(
                 model=self.embedding_model,
-                content=text
+                content=text,
+                output_dimensionality=768  # Match schema; 3072 is default for gemini-embedding-001
             )
             
             embedding = result['embedding']

@@ -42,8 +42,9 @@ class TestDatabaseConnection:
         DatabaseConnection._client = None
         DatabaseConnection._db = None
         
-        with pytest.raises(Exception):  # ConfigurationError or ValueError
-            DatabaseConnection()
+        conn = DatabaseConnection()
+        with pytest.raises(Exception):  # ConfigurationError - triggered on first access
+            _ = conn.client
     
     @patch.dict(os.environ, {'MONGODB_URI': 'mongodb://localhost:27017/test'})
     @patch('backend.config.database.MongoClient')
@@ -56,8 +57,9 @@ class TestDatabaseConnection:
         DatabaseConnection._client = None
         DatabaseConnection._db = None
         
+        conn = DatabaseConnection()
         with pytest.raises(ConnectionFailure):
-            DatabaseConnection()
+            _ = conn.client
     
     @patch.dict(os.environ, {'MONGODB_URI': 'mongodb://localhost:27017/test'})
     @patch('backend.config.database.MongoClient')

@@ -2,6 +2,7 @@
 import pytest
 from flask.testing import FlaskClient
 from unittest.mock import patch, MagicMock
+from bson import ObjectId
 
 from backend.models.user import User
 from backend.models.pod import Pod
@@ -120,11 +121,12 @@ def test_get_pod_success(client: FlaskClient, test_db, sample_user_data,
     })
     user1_id = user1_response.get_json()['user']['_id']
     
-    # Create pod directly in database for testing
+    # Create pod directly in database for testing (use valid ObjectIds)
+    other1, other2 = str(ObjectId()), str(ObjectId())
     pod_model = Pod()
     pod_id = pod_model.create(
         pod_type='friendship',
-        member_ids=[user1_id, 'user2_id', 'user3_id'],
+        member_ids=[user1_id, other1, other2],
         gemini_icebreaker='Test icebreaker'
     )
     
@@ -147,11 +149,12 @@ def test_leave_pod_success(client: FlaskClient, test_db, sample_user_data):
     })
     user_id = user_response.get_json()['user']['_id']
     
-    # Create pod with user as member
+    # Create pod with user as member (use valid ObjectIds for other members)
+    other1, other2 = str(ObjectId()), str(ObjectId())
     pod_model = Pod()
     pod_id = pod_model.create(
         pod_type='friendship',
-        member_ids=[user_id, 'user2_id', 'user3_id'],
+        member_ids=[user_id, other1, other2],
         gemini_icebreaker='Test icebreaker'
     )
     
@@ -179,11 +182,12 @@ def test_check_pod_expired(client: FlaskClient, test_db, sample_user_data):
     })
     user_id = user_response.get_json()['user']['_id']
     
-    # Create pod
+    # Create pod (use valid ObjectIds for other members)
+    other1, other2 = str(ObjectId()), str(ObjectId())
     pod_model = Pod()
     pod_id = pod_model.create(
         pod_type='friendship',
-        member_ids=[user_id, 'user2_id', 'user3_id'],
+        member_ids=[user_id, other1, other2],
         gemini_icebreaker='Test icebreaker'
     )
     
