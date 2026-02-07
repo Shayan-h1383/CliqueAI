@@ -10,6 +10,24 @@ from backend.middleware.auth_middleware import require_auth
 pods_bp = Blueprint('pods', __name__, url_prefix='/api/pods')
 
 
+@pods_bp.route('/mine', methods=['GET'])
+@require_auth
+def get_my_pods():
+    """Get all active pods where the current user is a member (supports multiple cliques)."""
+    try:
+        user_id = g.current_user_id
+        pod_model = Pod()
+        pods = pod_model.find_active_by_member(user_id)
+        return jsonify({
+            'pods': pods
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'error': str(e),
+            'code': 500
+        }), 500
+
+
 @pods_bp.route('/active', methods=['GET'])
 @require_auth
 def get_active_pod():

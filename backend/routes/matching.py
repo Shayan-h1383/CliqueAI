@@ -41,14 +41,14 @@ class FindMatchesRequest(BaseModel):
 
 class CreatePodRequest(BaseModel):
     """Request schema for creating a pod."""
-    match_type: str = Field(..., description="Type of pod: friendship, goal, or issues")
+    match_type: str = Field(..., description="Type of pod: evolve, enjoy, or support")
     member_ids: list = Field(..., min_length=3, max_length=3, description="List of exactly 3 user IDs")
     
     @classmethod
     def validate_match_type(cls, v: str) -> str:
         """Validate match_type."""
-        if v not in ['friendship', 'goal', 'issues']:
-            raise ValueError("match_type must be one of: friendship, goal, issues")
+        if v not in ['evolve', 'enjoy', 'support']:
+            raise ValueError("match_type must be one of: evolve, enjoy, support")
         return v
 
 
@@ -139,9 +139,9 @@ def create_pod():
             }), 400
         
         # Validate match_type
-        if pod_data.match_type not in ['friendship', 'goal', 'issues']:
+        if pod_data.match_type not in ['evolve', 'enjoy', 'support']:
             return jsonify({
-                'error': 'match_type must be one of: friendship, goal, issues',
+                'error': 'match_type must be one of: evolve, enjoy, support',
                 'code': 400
             }), 400
         

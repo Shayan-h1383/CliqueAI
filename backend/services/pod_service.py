@@ -51,19 +51,15 @@ class PodService:
             raise ValueError("Requester must be included in member_ids")
         
         # Validate match_type
-        if match_type not in ['friendship', 'goal', 'issues']:
-            raise ValueError("match_type must be one of: friendship, goal, issues")
+        if match_type not in ['evolve', 'enjoy', 'support']:
+            raise ValueError("match_type must be one of: evolve, enjoy, support")
         
-        # Check all members exist and don't have active pods
+        # Check all members exist (allow multiple cliques per user)
         user_profiles = []
         for member_id in member_ids:
             user = self.user_model.find_by_id(member_id)
             if not user:
                 raise ValueError(f"User {member_id} not found")
-            
-            # Check if user has active pod
-            if user.get('active_pod_id'):
-                raise ValueError(f"User {member_id} already has an active pod")
             
             # Collect user profile for icebreaker generation
             user_profiles.append({

@@ -15,6 +15,7 @@ class Profile(BaseModel):
     work_area: Optional[str] = Field(default=None, description="Work area for goal matching")
     current_goals: List[str] = Field(default_factory=list, description="Current goals for goal matching")
     struggles: List[str] = Field(default_factory=list, description="Struggles for issues matching")
+    profile_pic_url: Optional[str] = Field(default=None, description="URL to profile picture")
 
 
 class MatchingPreferences(BaseModel):

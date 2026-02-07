@@ -1,0 +1,402 @@
+[
+  {
+    "username": "Alex",
+    "details": "Former marketing professional pivoting into data science. Spent 5 years in advertising and now learning Python and ML on the side. Love structure and clear milestones. Based in Berlin, looking for accountability buddies who understand the career-switch struggle.",
+    "goal": "Launch freelance data analytics consultancy within 12 months",
+    "area": "business",
+    "matching_goal": "evolve",
+    "city": "Berlin"
+  },
+  {
+    "username": "Jordan",
+    "details": "University student studying computer science, struggling with algorithms and competitive programming. Want to build a side project but overwhelmed by coursework. Need peers who can explain concepts simply and share study techniques.",
+    "goal": "Master DSA and land an internship by summer",
+    "area": "studies",
+    "matching_goal": "evolve",
+    "city": "Berlin"
+  },
+  {
+    "username": "Sam",
+    "details": "Aspiring illustrator and digital artist. Working a day job in admin while building a portfolio at night. Feeling isolated in the creative journey and seeking others who balance art with real-life responsibilities.",
+    "goal": "Complete 50 portfolio pieces and start taking commissions",
+    "area": "arts development",
+    "matching_goal": "evolve",
+    "city": "Munich"
+  },
+  {
+    "username": "Riley",
+    "details": "Fitness enthusiast trying to transition from casual gym-goer to certified personal trainer. Currently studying for NASM certification and want to connect with others building careers in sports and wellness.",
+    "goal": "Get NASM certified and coach first 10 clients",
+    "area": "sports",
+    "matching_goal": "evolve",
+    "city": "Munich"
+  },
+  {
+    "username": "Casey",
+    "details": "Product manager wanting to level up in product strategy and stakeholder communication. Read a lot of books but lack a community to discuss frameworks and real-world application. Based in Hamburg.",
+    "goal": "Lead a major product launch from discovery to ship",
+    "area": "business",
+    "matching_goal": "evolve",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Morgan",
+    "details": "Medical student in final year, dealing with exam stress and imposter syndrome. Sometimes feels like giving up. Looking for peers who understand the grind and can offer mutual support and study tips.",
+    "goal": "Pass final exams and secure residency placement",
+    "area": "studies",
+    "matching_goal": "evolve",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Taylor",
+    "details": "Writer working on first novel. Has completed several short stories but struggles with long-form discipline. Needs accountability and feedback from fellow writers on the same journey.",
+    "goal": "Finish first draft of novel by end of year",
+    "area": "arts development",
+    "matching_goal": "evolve",
+    "city": "Cologne"
+  },
+  {
+    "username": "Quinn",
+    "details": "Ex-athlete recovering from injury, trying to stay connected to sports through coaching youth teams. Learning how to transition from player to mentor while managing physical limitations.",
+    "goal": "Build sustainable coaching practice without reinjury",
+    "area": "sports",
+    "matching_goal": "evolve",
+    "city": "Cologne"
+  },
+  {
+    "username": "Avery",
+    "details": "Self-taught developer with no formal CS degree. Landed first job 2 years ago but now wants to move into senior roles. Feels held back by lack of formal education and wants to build confidence.",
+    "goal": "Get promoted to senior dev or switch to better role",
+    "area": "general",
+    "matching_goal": "evolve",
+    "city": "Frankfurt"
+  },
+  {
+    "username": "Parker",
+    "details": "MBA graduate exploring entrepreneurship. Has ideas but paralyzed by analysis. Wants a small group to bounce ideas off and keep momentum. Based in Stuttgart.",
+    "goal": "Validate one business idea and get first paying customer",
+    "area": "business",
+    "matching_goal": "evolve",
+    "city": "Stuttgart"
+  },
+  {
+    "username": "Dakota",
+    "details": "PhD student in physics, often feeling isolated in the lab. Wants to connect with others in academia who understand the pressure and slow pace of research. Enjoys discussing big ideas.",
+    "goal": "Submit first paper and defend proposal successfully",
+    "area": "studies",
+    "matching_goal": "evolve",
+    "city": "Stuttgart"
+  },
+  {
+    "username": "Skyler",
+    "details": "Musician and producer learning music theory and mixing. Has released a few tracks but wants to improve technically. Looking for collaborators and mentors in the same city.",
+    "goal": "Release EP and play first live set",
+    "area": "arts development",
+    "matching_goal": "evolve",
+    "city": "Berlin"
+  },
+  {
+    "username": "Reese",
+    "details": "Marathon runner training for first ultra. Balancing work and long runs. Wants to connect with others pursuing endurance sports and share nutrition and recovery strategies.",
+    "goal": "Complete 50k ultra and qualify for Boston Marathon",
+    "area": "sports",
+    "matching_goal": "evolve",
+    "city": "Munich"
+  },
+  {
+    "username": "Cameron",
+    "details": "Career changer from finance to UX design. Taking online courses and building a portfolio. Needs feedback and encouragement from others making similar pivots.",
+    "goal": "Land first UX role within 6 months",
+    "area": "general",
+    "matching_goal": "evolve",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Jamie",
+    "details": "Small business owner running a café. Wanting to scale or franchise but unsure how. Looking for peers who have grown businesses and can share lessons learned.",
+    "goal": "Open second location or establish franchise model",
+    "area": "business",
+    "matching_goal": "evolve",
+    "city": "Cologne"
+  },
+  {
+    "username": "River",
+    "details": "Competitive gamer and streamer building audience. Plays Valorant and Apex. Wants to connect with others serious about content creation and improving at games.",
+    "goal": "Hit 1k Twitch followers and improve to Diamond rank",
+    "area": "gaming",
+    "matching_goal": "enjoy",
+    "city": "Berlin"
+  },
+  {
+    "username": "Sage",
+    "details": "YouTuber creating educational content on science and history. Loves research and storytelling. Wants to meet others in the content space for collaboration and growth tips.",
+    "goal": "Reach 10k subscribers and land first brand deal",
+    "area": "content",
+    "matching_goal": "enjoy",
+    "city": "Berlin"
+  },
+  {
+    "username": "Rowan",
+    "details": "Stand-up comedian and comedy writer. Performs at open mics and writes sketches. Looking for fellow humor enthusiasts to workshop material and share the ups and downs of comedy.",
+    "goal": "Land regular gig at a comedy club",
+    "area": "humour",
+    "matching_goal": "enjoy",
+    "city": "Munich"
+  },
+  {
+    "username": "Phoenix",
+    "details": "Outdoor enthusiast who hikes and camps every chance. Planning a thru-hike of a long trail. Wants to connect with others who love nature and adventure.",
+    "goal": "Complete multi-day thru-hike and document the journey",
+    "area": "hiking",
+    "matching_goal": "enjoy",
+    "city": "Munich"
+  },
+  {
+    "username": "Blair",
+    "details": "Wilderness survival enthusiast. Loves camping, bushcraft, and learning primitive skills. Wants a group to plan trips and share knowledge.",
+    "goal": "Lead a weekend survival skills workshop",
+    "area": "camping",
+    "matching_goal": "enjoy",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Drew",
+    "details": "Basketball player and fan. Plays in local league and follows NBA closely. Looking for pickup games and watch-party buddies.",
+    "goal": "Win local league and organize regular watch parties",
+    "area": "sports",
+    "matching_goal": "enjoy",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Finley",
+    "details": "Board game designer and collector. Has 200+ games and runs weekly game nights. Wants to meet others who love tabletop and maybe prototype together.",
+    "goal": "Publish first board game design",
+    "area": "gaming",
+    "matching_goal": "enjoy",
+    "city": "Cologne"
+  },
+  {
+    "username": "Hayden",
+    "details": "Podcaster and audio producer. Hosts a true crime podcast. Wants to improve production quality and grow listenership with like-minded creators.",
+    "goal": "Hit 5k downloads per episode and land a sponsor",
+    "area": "content",
+    "matching_goal": "enjoy",
+    "city": "Cologne"
+  },
+  {
+    "username": "Jesse",
+    "details": "Improviser and sketch comedian. Performs weekly and writes with a troupe. Wants to meet others who value quick wit and collaborative humor.",
+    "goal": "Tour with improv troupe to 3 cities",
+    "area": "humour",
+    "matching_goal": "enjoy",
+    "city": "Frankfurt"
+  },
+  {
+    "username": "Kai",
+    "details": "Trail runner and mountain lover. Does alpine hiking and scrambling. Wants to find training partners and plan hut-to-hut trips.",
+    "goal": "Complete a classic alpine traverse",
+    "area": "hiking",
+    "matching_goal": "enjoy",
+    "city": "Frankfurt"
+  },
+  {
+    "username": "Logan",
+    "details": "Overlanding enthusiast. Drives a 4x4 and loves multi-day camping trips. Wants to join or start an overlanding group for trips.",
+    "goal": "Organize a week-long overland expedition",
+    "area": "camping",
+    "matching_goal": "enjoy",
+    "city": "Stuttgart"
+  },
+  {
+    "username": "Marley",
+    "details": "Rock climber and boulderer. Climbs indoors and outdoors. Wants to improve grades and find climbing partners for weekend trips.",
+    "goal": "Send a 7a route and climb outdoors monthly",
+    "area": "sports",
+    "matching_goal": "enjoy",
+    "city": "Stuttgart"
+  },
+  {
+    "username": "Nico",
+    "details": "Speedrunner and retro gamer. Loves optimizing runs and collecting old consoles. Wants to meet others who appreciate gaming history and challenge runs.",
+    "goal": "Get a run on speedrun.com leaderboard",
+    "area": "gaming",
+    "matching_goal": "enjoy",
+    "city": "Berlin"
+  },
+  {
+    "username": "Owen",
+    "details": "TikTok creator focused on cooking and food content. Loves experimenting with recipes. Wants to connect with other food content creators for collabs.",
+    "goal": "Reach 50k followers and start a food brand",
+    "area": "content",
+    "matching_goal": "enjoy",
+    "city": "Munich"
+  },
+  {
+    "username": "Charlie",
+    "details": "In recovery from alcohol addiction, 8 months sober. Attends meetings but wants peer support outside that context. Looking for others who understand the journey.",
+    "goal": "Maintain sobriety and help others in early recovery",
+    "area": "addiction",
+    "matching_goal": "support",
+    "city": "Berlin"
+  },
+  {
+    "username": "Emery",
+    "details": "Going through a difficult divorce. Feeling isolated and anxious. Wants to connect with others who have navigated relationship endings and can offer perspective.",
+    "goal": "Heal and rebuild a sense of self and stability",
+    "area": "relationship",
+    "matching_goal": "support",
+    "city": "Berlin"
+  },
+  {
+    "username": "Robin",
+    "details": "Lost a parent recently. Grief feels overwhelming some days. Wants to talk with others who understand loss and aren't afraid of hard conversations.",
+    "goal": "Find a new normal while honoring their memory",
+    "area": "grief",
+    "matching_goal": "support",
+    "city": "Munich"
+  },
+  {
+    "username": "Shannon",
+    "details": "Living with chronic illness. Some days are hard. Wants to connect with others who get the invisible struggle and can share coping strategies.",
+    "goal": "Advocate for myself and find community",
+    "area": "illness",
+    "matching_goal": "support",
+    "city": "Munich"
+  },
+  {
+    "username": "Dana",
+    "details": "Dealing with depression and anxiety. In therapy and on medication. Wants peer support from others who are also working on mental health without judgment.",
+    "goal": "Build sustainable routines and feel less alone",
+    "area": "general depression",
+    "matching_goal": "support",
+    "city": "Hamburg"
+  },
+  {
+    "username": "JordanR",
+    "details": "Recovering from substance use. Early in the process. Wants accountability and hope from others further along. Based in Hamburg.",
+    "goal": "Stay clean one day at a time and rebuild trust",
+    "area": "addiction",
+    "matching_goal": "support",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Kelly",
+    "details": "Struggling with codependency and boundary issues in relationships. Working on self-worth. Wants to talk with others on similar healing paths.",
+    "goal": "Establish healthy boundaries and self-compassion",
+    "area": "relationship",
+    "matching_goal": "support",
+    "city": "Cologne"
+  },
+  {
+    "username": "Leslie",
+    "details": "Lost a sibling to illness. Grief comes in waves. Wants to connect with others who have lost family and understand the unique pain.",
+    "goal": "Honor their life and find meaning in the loss",
+    "area": "grief",
+    "matching_goal": "support",
+    "city": "Cologne"
+  },
+  {
+    "username": "MorganR",
+    "details": "Managing autoimmune condition. Diet and stress matter a lot. Wants to share experiences with others who navigate health limitations daily.",
+    "goal": "Optimize health and reduce flare-ups",
+    "area": "illness",
+    "matching_goal": "support",
+    "city": "Frankfurt"
+  },
+  {
+    "username": "Pat",
+    "details": "Struggling with seasonal depression and low energy. Trying light therapy and exercise. Wants peers who get it and don't offer quick fixes.",
+    "goal": "Get through winter and build resilience",
+    "area": "general depression",
+    "matching_goal": "support",
+    "city": "Frankfurt"
+  },
+  {
+    "username": "QuinnR",
+    "details": "In recovery, rebuilding life after addiction. Wants to help others and stay connected to a sober community. Based in Stuttgart.",
+    "goal": "Give back and maintain long-term sobriety",
+    "area": "addiction",
+    "matching_goal": "support",
+    "city": "Stuttgart"
+  },
+  {
+    "username": "RileyR",
+    "details": "Healing from a toxic relationship. Working on attachment and trust. Wants to share and listen with others in similar situations.",
+    "goal": "Learn to trust again and choose healthier partners",
+    "area": "relationship",
+    "matching_goal": "support",
+    "city": "Stuttgart"
+  },
+  {
+    "username": "SamR",
+    "details": "Lost a close friend to suicide. Carrying guilt and confusion. Wants to talk with others who have experienced similar loss.",
+    "goal": "Process the loss and support suicide prevention",
+    "area": "grief",
+    "matching_goal": "support",
+    "city": "Berlin"
+  },
+  {
+    "username": "TaylorR",
+    "details": "Living with fibromyalgia. Pain and fatigue are daily realities. Wants to connect with others who understand chronic pain.",
+    "goal": "Manage symptoms and maintain quality of life",
+    "area": "illness",
+    "matching_goal": "support",
+    "city": "Munich"
+  },
+  {
+    "username": "AlexR",
+    "details": "Struggling with anxiety and panic attacks. In therapy. Wants peer support from others who have learned to manage anxiety effectively.",
+    "goal": "Reduce panic frequency and live more freely",
+    "area": "general depression",
+    "matching_goal": "support",
+    "city": "Hamburg"
+  },
+  {
+    "username": "CaseyR",
+    "details": "Dealing with issues that don't fit neatly into categories. Feeling stuck. Wants a safe space to share and hear from others with varied struggles.",
+    "goal": "Find clarity and take small steps forward",
+    "area": "other",
+    "matching_goal": "support",
+    "city": "Cologne"
+  },
+  {
+    "username": "DakotaR",
+    "details": "New to Berlin, looking for evolve buddies in tech. Software engineer wanting to transition into ML. Needs accountability and study partners.",
+    "goal": "Complete ML course and build portfolio project",
+    "area": "studies",
+    "matching_goal": "evolve",
+    "city": "Berlin"
+  },
+  {
+    "username": "FinleyR",
+    "details": "Love RPGs and narrative games. Plays D&D and video RPGs. Wants to find a regular gaming group and maybe DM a campaign.",
+    "goal": "Run a full D&D campaign from start to finish",
+    "area": "gaming",
+    "matching_goal": "enjoy",
+    "city": "Frankfurt"
+  },
+  {
+    "username": "SkylerR",
+    "details": "Photographer and visual artist. Doing street photography and portraiture. Wants to collaborate and grow with other visual creators.",
+    "goal": "Exhibit work in a gallery or publish a zine",
+    "area": "arts development",
+    "matching_goal": "evolve",
+    "city": "Hamburg"
+  },
+  {
+    "username": "Emerson",
+    "details": "Junior developer learning cloud architecture and DevOps. Wants to move from monoliths to microservices. Based in Berlin, seeking study partners and mentors in the same space.",
+    "goal": "Pass AWS Solutions Architect certification",
+    "area": "studies",
+    "matching_goal": "evolve",
+    "city": "Berlin"
+  },
+  {
+    "username": "Kendall",
+    "details": "Podcast listener and aspiring host. Loves storytelling and deep conversations. Wants to start a podcast about career transitions and meet others in the content creation space.",
+    "goal": "Launch podcast and record first 10 episodes",
+    "area": "content",
+    "matching_goal": "enjoy",
+    "city": "Stuttgart"
+  }
+]

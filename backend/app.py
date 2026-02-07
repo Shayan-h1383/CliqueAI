@@ -11,6 +11,8 @@ from backend.routes.auth import auth_bp
 from backend.routes.matching import matching_bp
 from backend.routes.pods import pods_bp
 from backend.routes.messages import messages_bp, init_socketio, register_socketio_handlers
+from backend.routes.applications import applications_bp
+from backend.routes.invitations import invitations_bp
 
 load_dotenv()
 
@@ -39,6 +41,8 @@ def create_app() -> Flask:
     app.register_blueprint(matching_bp)
     app.register_blueprint(pods_bp)
     app.register_blueprint(messages_bp)
+    app.register_blueprint(applications_bp)
+    app.register_blueprint(invitations_bp)
     
     # Initialize rate limiter
     from flask_limiter import Limiter
@@ -128,6 +132,8 @@ def create_app() -> Flask:
                 'error': str(e)
             }), 503
     
+    # Matching runs synchronously on application submit; no background job needed
+
     # Request logging middleware
     @app.before_request
     def log_request():

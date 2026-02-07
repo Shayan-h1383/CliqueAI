@@ -19,10 +19,24 @@
             </router-link>
             <router-link
               v-if="authStore.isAuthenticated"
-              to="/matching"
+              to="/find-match"
               class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
             >
-              Find Matches
+              Find Match
+            </router-link>
+            <router-link
+              v-if="authStore.isAuthenticated"
+              to="/suggestions"
+              class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Suggestions
+            </router-link>
+            <router-link
+              v-if="authStore.isAuthenticated"
+              to="/invitations"
+              class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium"
+            >
+              Invitations
             </router-link>
             <Button
               v-if="authStore.isAuthenticated"
@@ -72,11 +86,27 @@
           </router-link>
           <router-link
             v-if="authStore.isAuthenticated"
-            to="/matching"
+            to="/find-match"
             class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium"
             @click="mobileMenuOpen = false"
           >
-            Find Matches
+            Find Match
+          </router-link>
+          <router-link
+            v-if="authStore.isAuthenticated"
+            to="/suggestions"
+            class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium"
+            @click="mobileMenuOpen = false"
+          >
+            Suggestions
+          </router-link>
+          <router-link
+            v-if="authStore.isAuthenticated"
+            to="/invitations"
+            class="block text-gray-700 hover:text-primary px-3 py-2 rounded-md text-base font-medium"
+            @click="mobileMenuOpen = false"
+          >
+            Invitations
           </router-link>
           <button
             v-if="authStore.isAuthenticated"

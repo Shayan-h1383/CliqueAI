@@ -88,8 +88,8 @@ class GeminiService:
         if not user_profiles:
             raise ValueError("user_profiles cannot be empty")
         
-        if match_type not in ['friendship', 'goal', 'issues']:
-            raise ValueError("match_type must be one of: friendship, goal, issues")
+        if match_type not in ['friendship', 'goal', 'issues', 'evolve', 'enjoy', 'support']:
+            raise ValueError("match_type must be one of: friendship, goal, issues, evolve, enjoy, support")
         
         # Build context from user profiles
         context_parts = []
@@ -102,18 +102,18 @@ class GeminiService:
             if focus_text:
                 context += f"Current focus: {focus_text}\n"
             
-            if match_type == 'friendship':
+            if match_type in ('friendship', 'enjoy'):
                 interests = user_profile.get('interests', [])
                 if interests:
                     context += f"Interests: {', '.join(interests)}\n"
-            elif match_type == 'goal':
+            elif match_type in ('goal', 'evolve'):
                 work_area = user_profile.get('work_area')
                 goals = user_profile.get('current_goals', [])
                 if work_area:
                     context += f"Work area: {work_area}\n"
                 if goals:
                     context += f"Current goals: {', '.join(goals)}\n"
-            elif match_type == 'issues':
+            elif match_type in ('issues', 'support'):
                 struggles = user_profile.get('struggles', [])
                 if struggles:
                     context += f"Struggles: {', '.join(struggles)}\n"
@@ -139,4 +139,49 @@ Generate a warm, encouraging icebreaker that helps them feel comfortable startin
             
         except Exception as e:
             raise Exception(f"Failed to generate icebreaker: {str(e)}") from e
+
+    def generate_similarity_reports(
+        self,
+        applicant_payload: Dict,
+        linked_payloads_with_scores: List[Dict],
+        goal: str,
+    ) -> List[str]:
+        """
+        Generate "why this person was selected for you" for each linked application.
+        
+        Args:
+            applicant_payload: The current application's payload (goal, area, details, etc.)
+            linked_payloads_with_scores: List of { payload, similarity_score } for each linked app
+            goal: evolve, enjoy, or support
+            
+        Returns:
+            List[str]: One short sentence per linked application (same order)
+        """
+        if not linked_payloads_with_scores:
+            return []
+        
+        goal_label = {"evolve": "growth", "enjoy": "shared enjoyment", "support": "support"}.get(goal, goal)
+        context = "Applicant looking for a clique to " + goal_label + ":\n"
+        context += f"Area/focus: {applicant_payload.get('area', '')}\n"
+        context += f"Details: {applicant_payload.get('details', '')}\n"
+        context += f"Extra: {applicant_payload.get('third_field', '')}\n\n"
+        
+        for i, item in enumerate(linked_payloads_with_scores, 1):
+            p = item.get("payload", {})
+            score = item.get("similarity_score", 0)
+            context += f"Suggested person {i} (similarity {score:.2f}): Area {p.get('area','')}, Details: {p.get('details','')}, Extra: {p.get('third_field','')}\n"
+        
+        prompt = f"""For each suggested person above, write exactly one short sentence (max 15 words) explaining why they were selected for the applicant. Output only the sentences, one per line, in the same order as suggested persons 1 to {len(linked_payloads_with_scores)}. No numbering."""
+        
+        try:
+            model = genai.GenerativeModel(self.chat_model)
+            response = model.generate_content(prompt + "\n\n" + context)
+            text = response.text.strip()
+            lines = [line.strip() for line in text.split("\n") if line.strip()][: len(linked_payloads_with_scores)]
+            # If we got fewer lines, pad with empty
+            while len(lines) < len(linked_payloads_with_scores):
+                lines.append("Good match based on your profile.")
+            return lines[: len(linked_payloads_with_scores)]
+        except Exception as e:
+            return ["Good match based on your profile."] * len(linked_payloads_with_scores)
 

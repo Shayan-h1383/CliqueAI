@@ -11,7 +11,7 @@ from backend.config.database import db_connection
 class PodSchema(BaseModel):
     """Pydantic schema for Pod validation."""
     id: Optional[str] = Field(default=None, alias="_id")
-    pod_type: str = Field(..., description="Type of pod: friendship, goal, or issues")
+    pod_type: str = Field(..., description="Type of pod: evolve, enjoy, or support")
     members: List[str] = Field(..., min_length=1, max_length=3, description="List of user IDs (max 3)")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Pod creation timestamp")
     expires_at: datetime = Field(..., description="Pod expiration timestamp (48 hours from creation)")
@@ -23,8 +23,8 @@ class PodSchema(BaseModel):
     @classmethod
     def validate_pod_type(cls, v: str) -> str:
         """Validate pod_type is one of the allowed values."""
-        if v not in ['friendship', 'goal', 'issues']:
-            raise ValueError("pod_type must be one of: friendship, goal, issues")
+        if v not in ['evolve', 'enjoy', 'support']:
+            raise ValueError("pod_type must be one of: evolve, enjoy, support")
         return v
     
     @field_validator('members')
@@ -87,7 +87,7 @@ class Pod:
         Create a new pod.
         
         Args:
-            pod_type: Type of pod (friendship, goal, issues)
+            pod_type: Type of pod (evolve, enjoy, support)
             member_ids: List of user IDs (max 3)
             gemini_icebreaker: Generated icebreaker text
             focus_context: Aggregated context from members
@@ -238,6 +238,22 @@ class Pod:
             "is_active": True,
             "expires_at": {"$gt": datetime.utcnow()}
         }))
+        
+        for pod in pods:
+            pod['_id'] = str(pod['_id'])
+            pod['members'] = [str(mid) for mid in pod.get('members', [])]
+        
+        return pods
+
+    def find_active_by_member(self, user_id: str) -> List[dict]:
+        """
+        Find all active pods where the user is a member.
+        """
+        pods = list(self.collection.find({
+            "members": ObjectId(user_id),
+            "is_active": True,
+            "expires_at": {"$gt": datetime.utcnow()}
+        }).sort("created_at", -1))
         
         for pod in pods:
             pod['_id'] = str(pod['_id'])

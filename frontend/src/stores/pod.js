@@ -27,6 +27,16 @@ export const usePodStore = defineStore('pod', () => {
     }
   }
 
+  async function fetchMyPods() {
+    try {
+      const response = await api.get('/pods/mine')
+      return response.data?.pods || []
+    } catch (error) {
+      console.error('Failed to fetch pods:', error)
+      throw error
+    }
+  }
+
   async function fetchPod(podId) {
     try {
       const response = await api.get(`/pods/${podId}`)
@@ -92,6 +102,7 @@ export const usePodStore = defineStore('pod', () => {
     podMembers,
     // Actions
     fetchActivePod,
+    fetchMyPods,
     fetchPod,
     fetchPodMembers,
     setActivePod,

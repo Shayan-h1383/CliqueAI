@@ -15,41 +15,51 @@
         </div>
       </div>
 
-      <div v-else-if="activePod" class="space-y-6">
-        <Card>
-          <div class="flex items-center justify-between">
-            <div>
-              <h2 class="text-2xl font-bold text-gray-800 mb-2">Active Pod</h2>
-              <p class="text-gray-600">
-                Type: <span class="font-semibold capitalize">{{ activePod.pod_type }}</span>
-              </p>
-              <p class="text-sm text-gray-500 mt-2">
-                Created: {{ formatDate(activePod.created_at) }}
-              </p>
+      <div v-else-if="pods.length > 0" class="space-y-6">
+        <h2 class="text-2xl font-bold text-gray-800 mb-4">Your cliques</h2>
+        <div
+          v-for="pod in pods"
+          :key="pod._id"
+          class="space-y-4"
+        >
+          <Card>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-gray-600">
+                  Type: <span class="font-semibold capitalize">{{ pod.pod_type }}</span>
+                </p>
+                <p class="text-sm text-gray-500 mt-2">
+                  Created: {{ formatDate(pod.created_at) }}
+                </p>
+              </div>
+              <Button variant="primary" size="lg" @click="goToPod(pod)">
+                Open Pod
+              </Button>
             </div>
-            <Button variant="primary" size="lg" @click="goToPod">
-              Open Pod
-            </Button>
-          </div>
-        </Card>
-
-        <Card v-if="activePod.gemini_icebreaker" class="bg-gradient-to-br from-accent/10 to-secondary/10">
-          <h3 class="text-lg font-bold text-gray-800 mb-2">Why you matched</h3>
-          <p class="text-gray-700">{{ activePod.gemini_icebreaker }}</p>
-        </Card>
+            <div v-if="pod.gemini_icebreaker" class="mt-4 p-4 rounded-lg bg-gradient-to-br from-accent/10 to-secondary/10">
+              <h3 class="text-lg font-bold text-gray-800 mb-2">Why you matched</h3>
+              <p class="text-gray-700">{{ pod.gemini_icebreaker }}</p>
+            </div>
+          </Card>
+        </div>
       </div>
 
       <div v-else class="text-center space-y-6">
         <Card class="max-w-md mx-auto">
           <div class="py-8">
             <div class="text-6xl mb-4">👥</div>
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">No Active Pod</h2>
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">No cliques yet</h2>
             <p class="text-gray-600 mb-6">
-              Start connecting with others by finding your perfect clique!
+              Submit a clique application or check your suggestions.
             </p>
-            <Button variant="primary" size="lg" @click="goToMatching">
-              Find Your Clique
-            </Button>
+            <div class="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button variant="primary" size="lg" @click="goToFindMatch">
+                Find your clique
+              </Button>
+              <Button variant="outline" size="lg" @click="goToSuggestions">
+                View suggestions
+              </Button>
+            </div>
           </div>
         </Card>
       </div>
@@ -69,21 +79,20 @@ const router = useRouter()
 const authStore = useAuthStore()
 const podStore = usePodStore()
 
-const activePod = ref(null)
+const pods = ref([])
 const loading = ref(true)
 
 onMounted(async () => {
-  await fetchActivePod()
+  await fetchMyPods()
 })
 
-async function fetchActivePod() {
+async function fetchMyPods() {
   loading.value = true
   try {
-    const pod = await podStore.fetchActivePod()
-    activePod.value = pod
+    pods.value = await podStore.fetchMyPods()
   } catch (error) {
-    console.error('Failed to fetch active pod:', error)
-    activePod.value = null
+    console.error('Failed to fetch pods:', error)
+    pods.value = []
   } finally {
     loading.value = false
   }
@@ -99,15 +108,16 @@ function formatDate(dateString) {
   })
 }
 
-function goToPod() {
-  if (activePod.value?._id || activePod.value?.id) {
-    const podId = activePod.value._id || activePod.value.id
-    router.push(`/pod/${podId}`)
-  }
+function goToPod(pod) {
+  const podId = pod?._id || pod?.id
+  if (podId) router.push(`/pod/${podId}`)
 }
 
-function goToMatching() {
-  router.push('/matching')
+function goToFindMatch() {
+  router.push('/find-match')
+}
+function goToSuggestions() {
+  router.push('/suggestions')
 }
 </script>
 

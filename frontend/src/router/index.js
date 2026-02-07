@@ -30,6 +30,24 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: '/find-match',
+      name: 'FindMatch',
+      component: () => import('@/views/FindMatch.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/suggestions',
+      name: 'Suggestions',
+      component: () => import('@/views/Suggestions.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/invitations',
+      name: 'Invitations',
+      component: () => import('@/views/Invitations.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
       path: '/matching',
       name: 'Matching',
       component: () => import('@/views/Matching.vue'),
