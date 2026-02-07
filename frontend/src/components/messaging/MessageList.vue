@@ -69,12 +69,17 @@ function isOwnMessage(message) {
 }
 
 function getSenderName(message) {
-  // Try to get username from podMembers or message
   if (message.sender_username) {
     return message.sender_username
   }
-  // For now, just return "User" if we can't find the name
-  return 'User'
+  const senderId = String(message.sender_id?._id ?? message.sender_id ?? '')
+  if (senderId && props.podMembers?.length) {
+    const member = props.podMembers.find(
+      (m) => String(m?.id ?? m?._id ?? m) === senderId
+    )
+    if (member?.username) return member.username
+  }
+  return 'Unknown'
 }
 
 function formatTime(timestamp) {

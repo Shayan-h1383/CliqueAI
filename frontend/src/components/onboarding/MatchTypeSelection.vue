@@ -11,12 +11,26 @@
         :hover="true"
         :class="[
           'text-center p-8 cursor-pointer transition-all',
-          selectedType === 'friendship' ? 'ring-4 ring-primary bg-primary/5' : ''
+          selectedType === 'evolve' ? 'ring-4 ring-primary bg-primary/5' : ''
         ]"
-        @click="selectType('friendship')"
+        @click="selectType('evolve')"
       >
-        <div class="text-5xl mb-4">🤝</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Friendship</h3>
+        <div class="text-5xl mb-4">🎯</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Evolve</h3>
+        <p class="text-gray-600">Grow and develop together</p>
+      </Card>
+
+      <Card
+        :clickable="true"
+        :hover="true"
+        :class="[
+          'text-center p-8 cursor-pointer transition-all',
+          selectedType === 'enjoy' ? 'ring-4 ring-primary bg-primary/5' : ''
+        ]"
+        @click="selectType('enjoy')"
+      >
+        <div class="text-5xl mb-4">💙</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Enjoy</h3>
         <p class="text-gray-600">Connect over shared interests</p>
       </Card>
 
@@ -25,26 +39,12 @@
         :hover="true"
         :class="[
           'text-center p-8 cursor-pointer transition-all',
-          selectedType === 'goal' ? 'ring-4 ring-primary bg-primary/5' : ''
+          selectedType === 'support' ? 'ring-4 ring-primary bg-primary/5' : ''
         ]"
-        @click="selectType('goal')"
+        @click="selectType('support')"
       >
-        <div class="text-5xl mb-4">🎯</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Goal</h3>
-        <p class="text-gray-600">Find accountability partners</p>
-      </Card>
-
-      <Card
-        :clickable="true"
-        :hover="true"
-        :class="[
-          'text-center p-8 cursor-pointer transition-all',
-          selectedType === 'issues' ? 'ring-4 ring-primary bg-primary/5' : ''
-        ]"
-        @click="selectType('issues')"
-      >
-        <div class="text-5xl mb-4">✨</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Issues</h3>
+        <div class="text-5xl mb-4">🤝</div>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Support</h3>
         <p class="text-gray-600">Get support for challenges</p>
       </Card>
     </div>

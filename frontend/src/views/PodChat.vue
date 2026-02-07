@@ -53,12 +53,14 @@ const loadingMessages = ref(false)
 const errorMessage = ref('')
 const podId = route.params.pod_id
 
-// Poll messages every 4 seconds
-const { pause: pausePolling, resume: resumePolling } = useInterval(async () => {
-  if (podId) {
-    await fetchMessages()
-  }
-}, 4000)
+// Poll messages every 4 seconds (paused until mounted, cleared on unmount)
+const { pause: pausePolling, resume: resumePolling } = useInterval(4000, {
+  callback: async () => {
+    if (route.params.pod_id) await fetchMessages()
+  },
+  controls: true,
+  immediate: false,
+})
 
 onMounted(async () => {
   await fetchPod()
@@ -68,6 +70,7 @@ onMounted(async () => {
 
 onUnmounted(() => {
   pausePolling()
+  pod.value = null
 })
 
 async function fetchPod() {

@@ -28,14 +28,14 @@ def init_limiter(app_limiter: Limiter):
 
 class FindMatchesRequest(BaseModel):
     """Request schema for finding matches."""
-    match_type: str = Field(..., description="Type of match: friendship, goal, or issues")
+    match_type: str = Field(..., description="Type of match: evolve, enjoy, or support")
     focus_text: str = Field(..., min_length=1, description="User's input describing their current need")
     
     @classmethod
     def validate_match_type(cls, v: str) -> str:
         """Validate match_type."""
-        if v not in ['friendship', 'goal', 'issues']:
-            raise ValueError("match_type must be one of: friendship, goal, issues")
+        if v not in ['evolve', 'enjoy', 'support']:
+            raise ValueError("match_type must be one of: evolve, enjoy, support")
         return v
 
 
@@ -75,9 +75,9 @@ def find_matches():
             }), 400
         
         # Validate match_type
-        if find_data.match_type not in ['friendship', 'goal', 'issues']:
+        if find_data.match_type not in ['evolve', 'enjoy', 'support']:
             return jsonify({
-                'error': 'match_type must be one of: friendship, goal, issues',
+                'error': 'match_type must be one of: evolve, enjoy, support',
                 'code': 400
             }), 400
         

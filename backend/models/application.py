@@ -116,15 +116,25 @@ class CliqueApplication:
         cursor = self.collection.find({"user_id": ObjectId(user_id)}).sort("date_submitted", -1)
         return [self._normalize(d) for d in cursor if d]
 
-    def find_by_filter(self, goal: str, city: str, area: str, exclude_application_id: str) -> List[dict]:
-        """Find ALL applications with same goal, city, and area (hard filter). Excludes given app and rejected."""
-        cursor = self.collection.find({
+    def find_by_filter(
+        self,
+        goal: str,
+        city: str,
+        area: str,
+        exclude_application_id: str,
+        exclude_user_id: Optional[str] = None,
+    ) -> List[dict]:
+        """Find ALL applications with same goal, city, and area (hard filter). Excludes given app, same user, and rejected."""
+        query = {
             "filter.goal": goal,
             "filter.city": city,
             "filter.area": area,
             "status": {"$in": ["pending", "matched"]},
             "_id": {"$ne": ObjectId(exclude_application_id)},
-        })
+        }
+        if exclude_user_id:
+            query["user_id"] = {"$ne": ObjectId(exclude_user_id)}
+        cursor = self.collection.find(query)
         return [self._normalize(d) for d in cursor if d]
 
     def update_linked_applications(self, application_id: str, linked: List[dict]) -> bool:
@@ -138,6 +148,33 @@ class CliqueApplication:
         result = self.collection.update_one(
             {"_id": ObjectId(application_id)},
             {"$set": set_fields}
+        )
+        return result.modified_count > 0
+
+    def append_linked_application(self, application_id: str, entry: dict) -> bool:
+        """Add a single linked application if not already present (for bidirectional suggestions)."""
+        app_id_str = str(application_id)
+        other_id = entry.get("application_id") or entry.get("_id")
+        if not other_id:
+            return False
+        other_id_str = str(other_id)
+        doc = self.collection.find_one({"_id": ObjectId(application_id)})
+        if not doc:
+            return False
+        existing = doc.get("linked_applications") or []
+        if any(str(e.get("application_id")) == other_id_str for e in existing):
+            return False
+        new_list = existing + [entry]
+        now = datetime.utcnow()
+        result = self.collection.update_one(
+            {"_id": ObjectId(application_id)},
+            {
+                "$set": {
+                    "linked_applications": new_list,
+                    "date_match_found": now,
+                    "status": "matched",
+                }
+            },
         )
         return result.modified_count > 0
 

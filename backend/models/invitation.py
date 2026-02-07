@@ -97,6 +97,37 @@ class Invitation:
         }).sort("created_at", -1)
         return [self._normalize(d) for d in cursor if d]
 
+    def find_pending_from_inviter_to_invitee(
+        self,
+        inviter_id: str,
+        invitee_id: str,
+        application_id: Optional[str] = None,
+    ) -> Optional[dict]:
+        """Find pending invitation from inviter to invitee (so invitee can accept/reject)."""
+        query = {
+            "inviter_id": ObjectId(inviter_id),
+            "invitee_id": ObjectId(invitee_id),
+            "status": "pending",
+        }
+        doc = self.collection.find_one(query)
+        return self._normalize(doc)
+
+    def find_any_between(
+        self,
+        user_id_a: str,
+        user_id_b: str,
+        application_id: Optional[str] = None,
+    ) -> Optional[dict]:
+        """Find any invitation (any status) between two users (either direction)."""
+        oid_a, oid_b = ObjectId(user_id_a), ObjectId(user_id_b)
+        doc = self.collection.find_one({
+            "$or": [
+                {"inviter_id": oid_a, "invitee_id": oid_b},
+                {"inviter_id": oid_b, "invitee_id": oid_a},
+            ],
+        })
+        return self._normalize(doc)
+
     def find_by_clique_group_id(self, clique_group_id: str) -> List[dict]:
         """Find all invitations in a clique group."""
         cursor = self.collection.find({"clique_group_id": clique_group_id})

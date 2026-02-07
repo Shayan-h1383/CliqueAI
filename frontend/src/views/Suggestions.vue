@@ -74,60 +74,91 @@
               <p class="text-sm mt-1">No other applications in your goal and city matched above the similarity threshold. Try different details or check back when more people apply.</p>
             </div>
             <div v-else>
-              <p class="text-sm font-medium text-gray-700 mb-3">Why these people were selected for you:</p>
+              <p class="text-sm font-medium text-gray-700 mb-3">Suggestions — accept or reject each to form your clique (chat starts when 3+ connect):</p>
               <div class="grid gap-4 sm:grid-cols-2">
                 <div
                   v-for="(link, idx) in app.linked_applications"
                   :key="link.application_id || idx"
                   class="bg-white rounded-lg p-4 border border-gray-200 flex items-start gap-3"
                 >
-                  <label class="flex items-start gap-3 flex-1 cursor-pointer">
-                    <input
-                      type="checkbox"
-                      :checked="selectedForPod.includes(link.application_id)"
-                      :disabled="selectedForPod.length >= 2 && !selectedForPod.includes(link.application_id)"
-                      class="mt-1 rounded border-gray-300 text-primary focus:ring-primary"
-                      @change="toggleForPod(link.application_id)"
-                    />
-                    <div class="flex-1 min-w-0">
-                      <div class="flex items-center gap-2">
-                        <img
-                          v-if="link.profile_pic_url"
-                          :src="link.profile_pic_url"
-                          alt=""
-                          class="w-10 h-10 rounded-full object-cover"
-                        />
-                        <div
-                          v-else
-                          class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold"
-                        >
-                          {{ (link.username || '?')[0].toUpperCase() }}
-                        </div>
-                        <span class="font-semibold text-gray-800">{{ link.username || 'Unknown' }}</span>
-                        <span class="text-sm text-primary font-medium">{{ Math.round((link.similarity_score || 0) * 100) }}% match</span>
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <img
+                        v-if="link.profile_pic_url"
+                        :src="link.profile_pic_url"
+                        alt=""
+                        class="w-10 h-10 rounded-full object-cover"
+                      />
+                      <div
+                        v-else
+                        class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold"
+                      >
+                        {{ (link.username || '?')[0].toUpperCase() }}
                       </div>
-                      <div v-if="link.payload" class="mt-2 p-3 rounded bg-gray-50 text-sm text-gray-700 space-y-1">
-                        <p><span class="font-medium">Goal:</span> {{ link.payload.goal }}</p>
-                        <p><span class="font-medium">Area:</span> {{ link.payload.area }}</p>
-                        <p><span class="font-medium">Details:</span> {{ link.payload.details }}</p>
-                        <p><span class="font-medium">Summary:</span> {{ link.payload.third_field }}</p>
-                        <p><span class="font-medium">City:</span> {{ link.payload.city }}</p>
-                      </div>
-                      <p v-else class="text-sm text-gray-600 mt-2">{{ link.why_selected || 'Good match based on your profile.' }}</p>
+                      <span class="font-semibold text-gray-800">{{ link.username || 'Unknown' }}</span>
+                      <span class="text-sm text-primary font-medium">{{ Math.round((link.similarity_score || 0) * 100) }}% match</span>
                     </div>
-                  </label>
+                    <div v-if="link.payload" class="mt-2 p-3 rounded bg-gray-50 text-sm text-gray-700 space-y-1">
+                      <p><span class="font-medium">Goal:</span> {{ link.payload.goal }}</p>
+                      <p><span class="font-medium">Area:</span> {{ link.payload.area }}</p>
+                      <p><span class="font-medium">Details:</span> {{ link.payload.details }}</p>
+                      <p><span class="font-medium">Summary:</span> {{ link.payload.third_field }}</p>
+                      <p><span class="font-medium">City:</span> {{ link.payload.city }}</p>
+                    </div>
+                    <p v-else class="text-sm text-gray-600 mt-2">{{ link.why_selected || 'Good match based on your profile.' }}</p>
+                    <div class="mt-3 flex items-center gap-2 flex-wrap">
+                      <span
+                        v-if="link.invitation_status === 'pending_them'"
+                        class="text-xs text-amber-700 bg-amber-100 px-2 py-0.5 rounded"
+                      >
+                        They invited you
+                      </span>
+                      <span
+                        v-else-if="link.invitation_status === 'pending_me'"
+                        class="text-xs text-gray-600 bg-gray-100 px-2 py-0.5 rounded"
+                      >
+                        Waiting for them
+                      </span>
+                      <span
+                        v-else-if="link.invitation_status === 'accepted'"
+                        class="text-xs text-green-700 bg-green-100 px-2 py-0.5 rounded"
+                      >
+                        Connected
+                      </span>
+                      <span
+                        v-else-if="link.invitation_status === 'rejected'"
+                        class="text-xs text-gray-500"
+                      >
+                        Rejected
+                      </span>
+                      <template v-if="!link.invitation_status || link.invitation_status === 'none' || link.invitation_status === 'pending_them'">
+                        <button
+                          type="button"
+                          class="p-2 rounded-lg font-medium text-white bg-green-600 hover:bg-green-700 disabled:opacity-50"
+                          :disabled="loadingRespond === linkKey(link)"
+                          :aria-label="'Accept ' + (link.username || 'suggestion')"
+                          @click="respond(app, link, true)"
+                        >
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                          </svg>
+                        </button>
+                        <button
+                          v-if="link.invitation_status !== 'rejected'"
+                          type="button"
+                          class="p-2 rounded-lg font-medium text-white bg-red-500 hover:bg-red-600 disabled:opacity-50"
+                          :disabled="loadingRespond === linkKey(link)"
+                          :aria-label="'Reject ' + (link.username || 'suggestion')"
+                          @click="respond(app, link, false)"
+                        >
+                          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                          </svg>
+                        </button>
+                      </template>
+                    </div>
+                  </div>
                 </div>
-              </div>
-              <div class="mt-4 flex items-center gap-4">
-                <button
-                  v-if="selectedForPod.length === 2"
-                  type="button"
-                  class="py-2 px-4 rounded-lg font-medium text-white bg-primary hover:bg-primary/90"
-                  @click="sendInvitations(app)"
-                >
-                  Send clique invitation to selected 2
-                </button>
-                <p v-else class="text-sm text-gray-500">Select 2 people to invite to your clique (you'll be the 3rd).</p>
               </div>
             </div>
           </div>
@@ -155,18 +186,55 @@ const authStore = useAuthStore()
 const applications = ref([])
 const loading = ref(true)
 const selectedId = ref(null)
-const selectedForPod = ref([])
+const loadingRespond = ref(null)
 const invitationError = ref('')
 const invitationSuccess = ref('')
 
-const goalIcons = { evolve: '🌱', enjoy: '🎯', support: '💙' }
+const goalIcons = { evolve: '🎯', enjoy: '💙', support: '🤝' }
 function goalIcon(goal) {
   return goalIcons[goal] || '•'
 }
 
-watch(selectedId, (newVal) => {
-  selectedForPod.value = []
-})
+function linkKey(link) {
+  return link.application_id + '-' + (link.user_id || '')
+}
+
+async function respond(app, link, accept) {
+  const key = linkKey(link)
+  loadingRespond.value = key
+  invitationError.value = ''
+  invitationSuccess.value = ''
+  if (!link.user_id) {
+    invitationError.value = 'Cannot respond: user not found.'
+    loadingRespond.value = null
+    return
+  }
+  try {
+    const res = await api.post('/invitations/respond', {
+      other_user_id: link.user_id,
+      accept,
+      match_type: app.filter?.goal || 'evolve',
+      application_id: app._id,
+    })
+    if (accept && res.data?.pod) {
+      invitationSuccess.value = 'Connected! Opening group chat...'
+      router.push(`/pod/${res.data.pod._id}`)
+      return
+    }
+    if (accept && res.data?.pending_them) {
+      invitationSuccess.value = 'Invitation sent. They’ll see it on their Suggestions page.'
+    } else if (accept) {
+      invitationSuccess.value = 'You’re connected. Group chat will open when 3+ are in the clique.'
+    } else {
+      invitationSuccess.value = 'Rejected.'
+    }
+    await fetchApplications()
+  } catch (err) {
+    invitationError.value = err.response?.data?.error || err.message || 'Request failed.'
+  } finally {
+    loadingRespond.value = null
+  }
+}
 
 async function fetchApplications() {
   loading.value = true
@@ -180,42 +248,6 @@ async function fetchApplications() {
   }
 }
 
-function toggleForPod(applicationId) {
-  const idx = selectedForPod.value.indexOf(applicationId)
-  if (idx >= 0) {
-    selectedForPod.value.splice(idx, 1)
-  } else if (selectedForPod.value.length < 2) {
-    selectedForPod.value.push(applicationId)
-  }
-}
-
-async function sendInvitations(app) {
-  if (selectedForPod.value.length !== 2) return
-  invitationError.value = ''
-  invitationSuccess.value = ''
-  const currentUserId = authStore.user?._id || authStore.user?.id
-  if (!currentUserId) {
-    invitationError.value = 'User not found'
-    return
-  }
-  const selectedApps = app.linked_applications.filter((l) => selectedForPod.value.includes(l.application_id))
-  const inviteeIds = [selectedApps[0].user_id, selectedApps[1].user_id]
-  if (inviteeIds.some((id) => id === currentUserId)) {
-    invitationError.value = 'You cannot invite yourself.'
-    return
-  }
-  try {
-    await api.post('/invitations', {
-      invitee_ids: inviteeIds,
-      match_type: app.filter?.goal || 'evolve',
-      application_id: app._id,
-    })
-    invitationSuccess.value = 'Invitations sent! The invited users will see them in their Invitations page.'
-    selectedForPod.value = []
-  } catch (err) {
-    invitationError.value = err.response?.data?.error || err.message || 'Failed to send invitations.'
-  }
-}
 
 onMounted(fetchApplications)
 </script>

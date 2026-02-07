@@ -60,18 +60,18 @@ const focusText = ref('')
 const error = ref('')
 
 const placeholders = {
-  friendship: "What are you passionate about? (e.g., 'I love indie music and hiking')",
-  goal: "What are you working towards? (e.g., 'Building my first SaaS to $10k MRR')",
-  issues: "What are you struggling with? (e.g., 'Feeling overwhelmed by job search')",
+  evolve: "What are you working towards? (e.g., 'Building my first SaaS to $10k MRR')",
+  enjoy: "What are you passionate about? (e.g., 'I love indie music and hiking')",
+  support: "What are you struggling with? (e.g., 'Feeling overwhelmed by job search')",
 }
 
 const placeholder = computed(() => placeholders[props.matchType] || 'Tell us about yourself...')
 
 const placeholderLabel = computed(() => {
   const labels = {
-    friendship: 'What are you passionate about?',
-    goal: 'What are you working towards?',
-    issues: 'What are you struggling with?',
+    evolve: 'What are you working towards?',
+    enjoy: 'What are you passionate about?',
+    support: 'What are you struggling with?',
   }
   return labels[props.matchType] || 'Tell us about yourself'
 })

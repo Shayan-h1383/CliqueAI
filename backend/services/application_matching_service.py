@@ -80,7 +80,9 @@ class ApplicationMatchingService:
         payload = application["payload"]
         threshold = _threshold()
 
-        candidates = self.app_model.find_by_filter(goal, city, area, application_id)
+        candidates = self.app_model.find_by_filter(
+            goal, city, area, application_id, exclude_user_id=application.get("user_id")
+        )
         if not candidates:
             self.app_model.update_linked_applications(application_id, [])
             return
@@ -111,3 +113,21 @@ class ApplicationMatchingService:
                 "why_selected": why,
             })
         self.app_model.update_linked_applications(application_id, linked_entries)
+
+        # Bidirectional: ensure each linked application also has this app in their list
+        # (skip if other application is from the same user - never suggest self to self)
+        my_user_id = application.get("user_id")
+        for entry in linked_entries:
+            other_app_id = entry["application_id"]
+            other_app = self.app_model.find_by_id(other_app_id)
+            if not other_app or str(other_app.get("user_id")) == str(my_user_id):
+                continue
+            existing = other_app.get("linked_applications") or []
+            if any(str(e.get("application_id")) == str(application_id) for e in existing):
+                continue
+            new_entry = {
+                "application_id": application_id,
+                "similarity_score": entry["similarity_score"],
+                "why_selected": "Good match based on your profile.",
+            }
+            self.app_model.append_linked_application(other_app_id, new_entry)

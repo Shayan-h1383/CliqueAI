@@ -58,7 +58,7 @@ def test_full_flow_register_find_create_pod_send_messages_leave(
         
         response = client.post('/api/matching/find',
             json={
-                'match_type': 'friendship',
+                'match_type': 'enjoy',
                 'focus_text': 'Looking for friends who like coding'
             },
             headers={'Authorization': f'Bearer {token1}'}
@@ -76,7 +76,7 @@ def test_full_flow_register_find_create_pod_send_messages_leave(
         
         response = client.post('/api/matching/create-pod',
             json={
-                'match_type': 'friendship',
+                'match_type': 'enjoy',
                 'member_ids': [user1_id, user2_id, user3_id]
             },
             headers={'Authorization': f'Bearer {token1}'}
@@ -172,7 +172,7 @@ def test_pod_expiration_flow(client: FlaskClient, test_db, sample_user_data,
         
         response = client.post('/api/matching/create-pod',
             json={
-                'match_type': 'friendship',
+                'match_type': 'enjoy',
                 'member_ids': [user1_id, user2_id, user3_id]
             },
             headers={'Authorization': f'Bearer {token1}'}
@@ -212,7 +212,7 @@ def test_multiple_pods_sequential(client: FlaskClient, test_db, sample_user_data
         
         response = client.post('/api/matching/create-pod',
             json={
-                'match_type': 'friendship',
+                'match_type': 'enjoy',
                 'member_ids': [user1_id, user2_id, user3_id]
             },
             headers={'Authorization': f'Bearer {token1}'}

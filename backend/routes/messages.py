@@ -6,6 +6,7 @@ import html
 
 from backend.models.message import Message
 from backend.models.pod import Pod
+from backend.models.user import User
 from backend.middleware.auth_middleware import require_auth
 from backend.services.auth_service import auth_service
 
@@ -87,9 +88,12 @@ def send_message():
             content=sanitized_content
         )
         
-        # Fetch created message
+        # Fetch created message and add sender username
         message = message_model.find_by_id(message_id)
-        
+        user_model = User()
+        sender = user_model.find_by_id(user_id) if user_id else None
+        message['sender_username'] = sender.get('username', 'Unknown') if sender else 'Unknown'
+
         # Emit SocketIO event to pod room
         if socketio:
             socketio.emit('new_message', {
@@ -144,7 +148,16 @@ def get_messages(pod_id: str):
             limit=limit,
             skip=skip
         )
-        
+        # Enrich with sender username for display
+        user_model = User()
+        for msg in messages:
+            sender_id = msg.get('sender_id')
+            if sender_id:
+                sender = user_model.find_by_id(sender_id)
+                msg['sender_username'] = sender.get('username', 'Unknown') if sender else 'Unknown'
+            else:
+                msg['sender_username'] = 'Unknown'
+
         return jsonify({
             'messages': messages,
             'count': len(messages),

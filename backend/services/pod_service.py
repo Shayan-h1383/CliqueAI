@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from typing import List, Dict, Optional
 from bson import ObjectId
 
-from backend.models.pod import Pod
+from backend.models.pod import Pod, MAX_POD_MEMBERS
 from backend.models.user import User
 from backend.services.gemini_service import GeminiService
 
@@ -29,12 +29,12 @@ class PodService:
         member_ids: List[str]
     ) -> Dict:
         """
-        Create a new pod with 3 members.
+        Create a new pod with 3-10 members.
         
         Args:
             user_id: ID of the user creating the pod (must be in member_ids)
-            match_type: Type of pod (friendship, goal, issues)
-            member_ids: List of exactly 3 user IDs including the requester
+            match_type: Type of pod (evolve, enjoy, support)
+            member_ids: List of 3-10 user IDs including the requester
             
         Returns:
             dict: Created pod with icebreaker
@@ -42,9 +42,9 @@ class PodService:
         Raises:
             ValueError: If validation fails
         """
-        # Validate exactly 3 members
-        if len(member_ids) != 3:
-            raise ValueError("Pod must have exactly 3 members")
+        # Validate 3-10 members
+        if len(member_ids) < 3 or len(member_ids) > MAX_POD_MEMBERS:
+            raise ValueError(f"Pod must have between 3 and {MAX_POD_MEMBERS} members")
         
         # Validate requester is in member list
         if user_id not in member_ids:
@@ -77,14 +77,19 @@ class PodService:
         
         focus_context = ' | '.join(focus_contexts) if focus_contexts else None
         
-        # Generate icebreaker using Gemini
+        # Generate icebreaker using Gemini; fallback so pod is always created
+        icebreaker = None
         try:
             icebreaker = self.gemini_service.generate_icebreaker(
                 user_profiles=user_profiles,
                 match_type=match_type
             )
         except Exception as e:
-            raise ValueError(f"Failed to generate icebreaker: {str(e)}")
+            usernames = [p.get("username", "Someone") for p in user_profiles]
+            icebreaker = (
+                f"You're all connected. Say hi and share what brought you here — "
+                f"{', '.join(usernames[:3])}{' and others' if len(usernames) > 3 else ''}."
+            )
         
         # Create pod
         pod_id = self.pod_model.create(
@@ -104,7 +109,27 @@ class PodService:
             raise ValueError("Failed to create pod")
         
         return pod
-    
+
+    def add_member_to_pod(self, pod_id: str, user_id: str) -> bool:
+        """
+        Add a member to an existing pod (e.g. when clique grows).
+        Sets the new member's active_pod_id. Returns True if added.
+        """
+        pod = self.pod_model.find_by_id(pod_id)
+        if not pod:
+            raise ValueError("Pod not found")
+        if user_id in pod.get("members", []):
+            return False
+        if len(pod.get("members", [])) >= MAX_POD_MEMBERS:
+            raise ValueError(f"Pod already has maximum {MAX_POD_MEMBERS} members")
+        user = self.user_model.find_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        ok = self.pod_model.add_member(pod_id, user_id)
+        if ok:
+            self.user_model.set_active_pod(user_id, pod_id)
+        return ok
+
     def leave_pod(self, user_id: str, pod_id: str) -> bool:
         """
         Remove a user from a pod.

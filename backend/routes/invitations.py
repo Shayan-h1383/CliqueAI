@@ -17,6 +17,13 @@ class CreateInvitationsRequest(BaseModel):
     application_id: Optional[str] = Field(default=None)
 
 
+class RespondToSuggestionRequest(BaseModel):
+    other_user_id: str = Field(..., description="User ID of the suggested person")
+    accept: bool = Field(..., description="True to accept, False to reject")
+    match_type: str = Field(default="evolve", description="evolve, enjoy, or support")
+    application_id: Optional[str] = Field(default=None)
+
+
 @invitations_bp.route('', methods=['POST'])
 @require_auth
 def create_invitations():
@@ -41,6 +48,34 @@ def create_invitations():
             application_id=body.application_id,
         )
         return jsonify(result), 201
+    except ValueError as e:
+        return jsonify({'error': str(e), 'code': 400}), 400
+    except Exception as e:
+        return jsonify({'error': str(e), 'code': 500}), 500
+
+
+@invitations_bp.route('/respond', methods=['POST'])
+@require_auth
+def respond_to_suggestion():
+    """Accept or reject a suggestion (one person). Mutual accept creates/updates clique; pod when 3+."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Request body is required', 'code': 400}), 400
+        try:
+            body = RespondToSuggestionRequest(**data)
+        except ValidationError as e:
+            return jsonify({'error': 'Validation failed', 'code': 400, 'details': e.errors()}), 400
+        my_id = g.current_user_id
+        service = InvitationService()
+        result = service.respond_to_suggestion(
+            my_id=my_id,
+            other_user_id=body.other_user_id,
+            accept=body.accept,
+            match_type=body.match_type,
+            application_id=body.application_id,
+        )
+        return jsonify(result), 200
     except ValueError as e:
         return jsonify({'error': str(e), 'code': 400}), 400
     except Exception as e:

@@ -12,11 +12,6 @@
       </Button>
     </div>
 
-    <!-- Timer -->
-    <div class="px-4 py-4">
-      <PodTimer :expires-at="pod.expires_at" />
-    </div>
-
     <!-- Icebreaker -->
     <div class="px-4 pb-4">
       <IcebreakerCard :icebreaker="pod.gemini_icebreaker || 'You all share common interests!'" />
@@ -38,7 +33,6 @@
 </template>
 
 <script setup>
-import PodTimer from './PodTimer.vue'
 import IcebreakerCard from './IcebreakerCard.vue'
 import MessageList from './MessageList.vue'
 import MessageInput from './MessageInput.vue'

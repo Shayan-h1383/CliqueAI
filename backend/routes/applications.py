@@ -1,9 +1,12 @@
 """Clique application routes: submit, list mine, get one with linked suggestions, admin reject."""
+from typing import Optional
 from flask import Blueprint, request, jsonify, g
 from pydantic import BaseModel, Field, ValidationError
 
 from backend.models.application import CliqueApplication, GOALS
 from backend.models.user import User
+from backend.models.invitation import Invitation
+from backend.models.clique import Clique
 from backend.services.application_matching_service import ApplicationMatchingService
 from backend.middleware.auth_middleware import require_auth
 
@@ -59,8 +62,8 @@ def submit_application():
             third_field=body.third_field.strip(),
             city=body.city.strip(),
         )
-        # Enrich linked_applications with user info for display
-        application = _enrich_linked(application)
+        # Enrich linked_applications with user info and invitation status
+        application = _enrich_linked(application, user_id)
         return jsonify(application), 201
     except ValueError as e:
         return jsonify({'error': str(e), 'code': 400}), 400
@@ -77,7 +80,7 @@ def list_my_applications():
         app_model = CliqueApplication()
         applications = app_model.find_by_user_id(user_id)
         for app in applications:
-            _enrich_linked(app)
+            _enrich_linked(app, user_id)
         return jsonify(applications), 200
     except Exception as e:
         return jsonify({'error': str(e), 'code': 500}), 500
@@ -95,7 +98,7 @@ def get_application(application_id):
             return jsonify({'error': 'Application not found', 'code': 404}), 404
         if application['user_id'] != user_id:
             return jsonify({'error': 'Forbidden', 'code': 403}), 403
-        application = _enrich_linked(application)
+        application = _enrich_linked(application, user_id)
         return jsonify(application), 200
     except Exception as e:
         return jsonify({'error': str(e), 'code': 500}), 500
@@ -123,22 +126,53 @@ def update_application(application_id):
         return jsonify({'error': str(e), 'code': 500}), 500
 
 
-def _enrich_linked(application: dict) -> dict:
-    """Add username, profile_pic_url, and payload to each linked application entry."""
+def _invitation_status(
+    current_user_id: str,
+    other_user_id: str,
+    application_id: Optional[str] = None,
+) -> str:
+    """Returns: none, pending_them, pending_me, accepted, rejected. Scoped by application_id when provided."""
+    if not other_user_id:
+        return "none"
+    # If we're in the same clique (or pod), we're connected regardless of invitation state
+    clique_model = Clique()
+    if clique_model.find_containing_both(current_user_id, other_user_id):
+        return "accepted"
+    inv_model = Invitation()
+    inv = inv_model.find_any_between(current_user_id, other_user_id, application_id=application_id)
+    if not inv:
+        return "none"
+    status = inv.get("status") or "pending"
+    if status == "accepted":
+        return "accepted"
+    if status == "rejected":
+        return "rejected"
+    if inv["invitee_id"] == current_user_id:
+        return "pending_them"
+    return "pending_me"
+
+
+def _enrich_linked(application: dict, current_user_id: str) -> dict:
+    """Add username, profile_pic_url, payload, and invitation_status. Exclude self from list."""
     linked = application.get('linked_applications') or []
     user_model = User()
     app_model = CliqueApplication()
+    application_id = application.get('_id')
     enriched = []
     for entry in linked:
         app_id = entry.get('application_id')
         other = app_model.find_by_id(app_id) if app_id else None
-        user = user_model.find_by_id(other['user_id']) if other else None
+        other_user_id = str(other['user_id']) if other else None
+        if not other_user_id or other_user_id == current_user_id:
+            continue
+        user = user_model.find_by_id(other_user_id)
         enriched.append({
             **entry,
-            'user_id': other['user_id'] if other else None,
+            'user_id': other_user_id,
             'username': user.get('username', 'Unknown') if user else 'Unknown',
             'profile_pic_url': user.get('profile', {}).get('profile_pic_url') if user else None,
             'payload': other.get('payload') if other else None,
+            'invitation_status': _invitation_status(current_user_id, other_user_id, application_id),
         })
     application['linked_applications'] = enriched
     return application

@@ -31,7 +31,7 @@ class MatchingService:
         
         Args:
             user_id: ID of the user looking for matches
-            match_type: Type of match ("friendship", "goal", or "issues")
+            match_type: Type of match ("evolve", "enjoy", or "support")
             focus_text: User's input describing their current need
             
         Returns:
@@ -49,8 +49,8 @@ class MatchingService:
         if not user_id:
             raise ValueError("user_id cannot be empty")
         
-        if match_type not in ['friendship', 'goal', 'issues']:
-            raise ValueError("match_type must be one of: friendship, goal, issues")
+        if match_type not in ['evolve', 'enjoy', 'support']:
+            raise ValueError("match_type must be one of: evolve, enjoy, support")
         
         if not focus_text or not focus_text.strip():
             raise ValueError("focus_text cannot be empty")
@@ -127,7 +127,7 @@ class MatchingService:
         
         Args:
             user_id: ID of the user looking for matches
-            match_type: Type of match ("friendship", "goal", or "issues")
+            match_type: Type of match ("evolve", "enjoy", or "support")
             
         Returns:
             List[Dict]: List of match dictionaries (same format as find_matches)

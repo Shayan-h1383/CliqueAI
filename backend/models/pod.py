@@ -8,11 +8,14 @@ from pymongo.collection import Collection
 from backend.config.database import db_connection
 
 
+MAX_POD_MEMBERS = 10
+
+
 class PodSchema(BaseModel):
     """Pydantic schema for Pod validation."""
     id: Optional[str] = Field(default=None, alias="_id")
     pod_type: str = Field(..., description="Type of pod: evolve, enjoy, or support")
-    members: List[str] = Field(..., min_length=1, max_length=3, description="List of user IDs (max 3)")
+    members: List[str] = Field(..., min_length=1, max_length=MAX_POD_MEMBERS, description="List of user IDs (max 10)")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Pod creation timestamp")
     expires_at: datetime = Field(..., description="Pod expiration timestamp (48 hours from creation)")
     is_active: bool = Field(default=True, description="Whether the pod is currently active")
@@ -31,8 +34,8 @@ class PodSchema(BaseModel):
     @classmethod
     def validate_members(cls, v: List[str]) -> List[str]:
         """Validate members list length."""
-        if len(v) < 1 or len(v) > 3:
-            raise ValueError("members must contain between 1 and 3 user IDs")
+        if len(v) < 1 or len(v) > MAX_POD_MEMBERS:
+            raise ValueError(f"members must contain between 1 and {MAX_POD_MEMBERS} user IDs")
         return v
     
     @field_validator('expires_at')
@@ -260,4 +263,23 @@ class Pod:
             pod['members'] = [str(mid) for mid in pod.get('members', [])]
         
         return pods
+
+    def add_member(self, pod_id: str, user_id: str) -> bool:
+        """Add a member to an existing pod if under max. Returns True if added."""
+        try:
+            pod = self.collection.find_one({"_id": ObjectId(pod_id)})
+            if not pod:
+                return False
+            members = list(pod.get("members", []))
+            if ObjectId(user_id) in members:
+                return False
+            if len(members) >= MAX_POD_MEMBERS:
+                return False
+            result = self.collection.update_one(
+                {"_id": ObjectId(pod_id)},
+                {"$addToSet": {"members": ObjectId(user_id)}}
+            )
+            return result.modified_count > 0
+        except Exception:
+            return False
 

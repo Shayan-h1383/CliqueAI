@@ -3,11 +3,31 @@ from flask import Blueprint, request, jsonify, g
 
 from backend.models.pod import Pod
 from backend.models.user import User
+from backend.models.clique import Clique
 from backend.services.pod_service import PodService
 from backend.middleware.auth_middleware import require_auth
 
 
 pods_bp = Blueprint('pods', __name__, url_prefix='/api/pods')
+
+
+def _ensure_pods_for_user_cliques(user_id: str) -> None:
+    """Create pods for any clique the user is in that has 3+ members but no pod yet."""
+    clique_model = Clique()
+    pod_service = PodService()
+    for clique in clique_model.find_by_member(user_id):
+        members = clique.get("members") or []
+        if len(members) < 3 or clique.get("pod_id"):
+            continue
+        try:
+            pod = pod_service.create_pod(
+                user_id=members[0],
+                match_type=clique.get("match_type", "evolve"),
+                member_ids=members,
+            )
+            clique_model.set_pod_id(clique["_id"], pod["_id"])
+        except Exception:
+            continue
 
 
 @pods_bp.route('/mine', methods=['GET'])
@@ -16,6 +36,7 @@ def get_my_pods():
     """Get all active pods where the current user is a member (supports multiple cliques)."""
     try:
         user_id = g.current_user_id
+        _ensure_pods_for_user_cliques(user_id)
         pod_model = Pod()
         pods = pod_model.find_active_by_member(user_id)
         return jsonify({

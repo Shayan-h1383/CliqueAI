@@ -20,7 +20,7 @@ class Profile(BaseModel):
 
 class MatchingPreferences(BaseModel):
     """User matching preferences and focus."""
-    match_type: Optional[str] = Field(default=None, description="Type of match: friendship, goal, or issues")
+    match_type: Optional[str] = Field(default=None, description="Type of match: evolve, enjoy, or support")
     current_focus_text: Optional[str] = Field(default=None, description="User's input describing their current need")
     focus_embedding: Optional[List[float]] = Field(default=None, description="Gemini embedding vector")
     last_updated: Optional[datetime] = Field(default=None, description="Last update timestamp")
@@ -29,8 +29,8 @@ class MatchingPreferences(BaseModel):
     @classmethod
     def validate_match_type(cls, v: Optional[str]) -> Optional[str]:
         """Validate match_type is one of the allowed values."""
-        if v is not None and v not in ['friendship', 'goal', 'issues']:
-            raise ValueError("match_type must be one of: friendship, goal, issues")
+        if v is not None and v not in ['evolve', 'enjoy', 'support']:
+            raise ValueError("match_type must be one of: evolve, enjoy, support")
         return v
 
 
@@ -108,6 +108,16 @@ class User:
         except DuplicateKeyError as e:
             raise DuplicateKeyError(f"User with this username or email already exists: {str(e)}")
     
+    @staticmethod
+    def _serialize_user(doc: Optional[dict]) -> Optional[dict]:
+        """Convert ObjectId fields to strings for JSON serialization."""
+        if not doc:
+            return None
+        doc['_id'] = str(doc['_id'])
+        if doc.get('active_pod_id') is not None:
+            doc['active_pod_id'] = str(doc['active_pod_id'])
+        return doc
+
     def find_by_id(self, user_id: str) -> Optional[dict]:
         """
         Find user by ID.
@@ -120,9 +130,7 @@ class User:
         """
         try:
             user = self.collection.find_one({"_id": ObjectId(user_id)})
-            if user:
-                user['_id'] = str(user['_id'])
-            return user
+            return self._serialize_user(user)
         except Exception:
             return None
     
@@ -137,9 +145,7 @@ class User:
             dict: User document or None if not found
         """
         user = self.collection.find_one({"username": username})
-        if user:
-            user['_id'] = str(user['_id'])
-        return user
+        return self._serialize_user(user)
     
     def find_by_email(self, email: str) -> Optional[dict]:
         """
@@ -152,9 +158,7 @@ class User:
             dict: User document or None if not found
         """
         user = self.collection.find_one({"email": email})
-        if user:
-            user['_id'] = str(user['_id'])
-        return user
+        return self._serialize_user(user)
     
     def update(self, user_id: str, update_data: dict) -> bool:
         """
@@ -196,7 +200,7 @@ class User:
         
         Args:
             user_id: User ID as string
-            match_type: Type of match (friendship, goal, issues)
+            match_type: Type of match (evolve, enjoy, support)
             current_focus_text: User's focus text
             focus_embedding: Embedding vector
             

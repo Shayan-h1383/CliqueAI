@@ -102,9 +102,9 @@ import api from '@/services/api'
 
 const router = useRouter()
 const goals = [
-  { id: 'evolve', label: 'Evolve', icon: '🌱' },
-  { id: 'enjoy', label: 'Enjoy', icon: '🎯' },
-  { id: 'support', label: 'Support', icon: '💙' },
+  { id: 'evolve', label: 'Evolve', icon: '🎯' },
+  { id: 'enjoy', label: 'Enjoy', icon: '💙' },
+  { id: 'support', label: 'Support', icon: '🤝' },
 ]
 
 const minDescriptionWords = 15
