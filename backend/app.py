@@ -1,7 +1,7 @@
 """Flask application initialization and configuration."""
 import os
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
