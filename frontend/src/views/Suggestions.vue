@@ -13,7 +13,7 @@
       <div v-else-if="applications.length === 0" class="text-center py-12">
         <p class="text-gray-600 mb-4">You haven't submitted any clique applications yet.</p>
         <router-link
-          to="/find-match"
+          to="/dashboard"
           class="inline-block py-3 px-6 rounded-lg font-semibold text-white bg-primary hover:bg-primary/90"
         >
           Find your clique
@@ -154,7 +154,7 @@
       </div>
 
       <div v-if="applications.length > 0" class="mt-8 text-center">
-        <router-link to="/find-match" class="text-primary font-medium hover:underline">Submit another application</router-link>
+        <router-link to="/dashboard" class="text-primary font-medium hover:underline">Submit another application</router-link>
       </div>
 
       <div v-if="invitationError" class="mt-4 text-red-600 text-sm">{{ invitationError }}</div>

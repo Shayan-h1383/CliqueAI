@@ -16,6 +16,7 @@ class PodSchema(BaseModel):
     id: Optional[str] = Field(default=None, alias="_id")
     pod_type: str = Field(..., description="Type of pod: evolve, enjoy, or support")
     members: List[str] = Field(..., min_length=1, max_length=MAX_POD_MEMBERS, description="List of user IDs (max 10)")
+    application_id: Optional[str] = Field(default=None, description="Application this pod/chat belongs to (one chat per application)")
     created_at: datetime = Field(default_factory=datetime.utcnow, description="Pod creation timestamp")
     expires_at: datetime = Field(..., description="Pod expiration timestamp (48 hours from creation)")
     is_active: bool = Field(default=True, description="Whether the pod is currently active")
@@ -84,7 +85,8 @@ class Pod:
         pod_type: str,
         member_ids: List[str],
         gemini_icebreaker: Optional[str] = None,
-        focus_context: Optional[str] = None
+        focus_context: Optional[str] = None,
+        application_id: Optional[str] = None,
     ) -> str:
         """
         Create a new pod.
@@ -94,6 +96,7 @@ class Pod:
             member_ids: List of user IDs (max 3)
             gemini_icebreaker: Generated icebreaker text
             focus_context: Aggregated context from members
+            application_id: Optional application this pod belongs to (one chat per application)
             
         Returns:
             str: The created pod's ID as string
@@ -107,6 +110,7 @@ class Pod:
         pod_data = {
             "pod_type": pod_type,
             "members": [ObjectId(mid) for mid in member_ids],
+            "application_id": ObjectId(application_id) if application_id else None,
             "created_at": created_at,
             "expires_at": expires_at,
             "is_active": True,
@@ -114,10 +118,11 @@ class Pod:
             "focus_context": focus_context
         }
         
-        # Validate with Pydantic
+        # Validate with Pydantic (schema expects members and application_id as strings)
         pod_schema = PodSchema(**{
             **pod_data,
-            "members": member_ids  # Pass as strings for validation
+            "members": member_ids,
+            "application_id": application_id,
         })
         
         try:
@@ -141,6 +146,8 @@ class Pod:
             if pod:
                 pod['_id'] = str(pod['_id'])
                 pod['members'] = [str(mid) for mid in pod.get('members', [])]
+                if pod.get('application_id'):
+                    pod['application_id'] = str(pod['application_id'])
             return pod
         except Exception:
             return None
@@ -164,6 +171,8 @@ class Pod:
             if pod:
                 pod['_id'] = str(pod['_id'])
                 pod['members'] = [str(mid) for mid in pod.get('members', [])]
+                if pod.get('application_id'):
+                    pod['application_id'] = str(pod['application_id'])
             return pod
         except Exception:
             return None
@@ -245,6 +254,8 @@ class Pod:
         for pod in pods:
             pod['_id'] = str(pod['_id'])
             pod['members'] = [str(mid) for mid in pod.get('members', [])]
+            if pod.get('application_id'):
+                pod['application_id'] = str(pod['application_id'])
         
         return pods
 
@@ -261,6 +272,8 @@ class Pod:
         for pod in pods:
             pod['_id'] = str(pod['_id'])
             pod['members'] = [str(mid) for mid in pod.get('members', [])]
+            if pod.get('application_id'):
+                pod['application_id'] = str(pod['application_id'])
         
         return pods
 

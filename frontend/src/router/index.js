@@ -30,12 +30,6 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
-      path: '/find-match',
-      name: 'FindMatch',
-      component: () => import('@/views/FindMatch.vue'),
-      meta: { requiresAuth: true },
-    },
-    {
       path: '/suggestions',
       name: 'Suggestions',
       component: () => import('@/views/Suggestions.vue'),

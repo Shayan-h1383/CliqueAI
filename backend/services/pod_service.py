@@ -26,7 +26,8 @@ class PodService:
         self,
         user_id: str,
         match_type: str,
-        member_ids: List[str]
+        member_ids: List[str],
+        application_id: Optional[str] = None,
     ) -> Dict:
         """
         Create a new pod with 3-10 members.
@@ -35,6 +36,7 @@ class PodService:
             user_id: ID of the user creating the pod (must be in member_ids)
             match_type: Type of pod (evolve, enjoy, support)
             member_ids: List of 3-10 user IDs including the requester
+            application_id: Optional application this pod belongs to (one chat per application)
             
         Returns:
             dict: Created pod with icebreaker
@@ -96,7 +98,8 @@ class PodService:
             pod_type=match_type,
             member_ids=member_ids,
             gemini_icebreaker=icebreaker,
-            focus_context=focus_context
+            focus_context=focus_context,
+            application_id=application_id,
         )
         
         # Update all members' active_pod_id

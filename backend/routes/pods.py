@@ -30,6 +30,35 @@ def _ensure_pods_for_user_cliques(user_id: str) -> None:
             continue
 
 
+def _enrich_pod_with_member_names(
+    pod: dict, user_model: User, current_user_id: str | None = None
+) -> None:
+    """Add member_usernames to a single pod for sidebar display. Use 'you' for current user."""
+    member_ids = pod.get('members') or []
+    names = []
+    for mid in member_ids:
+        try:
+            user_id = str(mid) if mid is not None else None
+            if not user_id:
+                continue
+            if current_user_id and user_id == current_user_id:
+                names.append('you')
+                continue
+            user = user_model.find_by_id(user_id)
+            names.append(user.get('username', 'Unknown') if user else 'Unknown')
+        except Exception:
+            names.append('Unknown')
+    pod['member_usernames'] = names
+
+
+def _enrich_pods_with_member_names(pods: list, current_user_id: str | None = None) -> list:
+    """Add member_usernames to each pod for sidebar display."""
+    user_model = User()
+    for pod in pods:
+        _enrich_pod_with_member_names(pod, user_model, current_user_id)
+    return pods
+
+
 @pods_bp.route('/mine', methods=['GET'])
 @require_auth
 def get_my_pods():
@@ -39,6 +68,7 @@ def get_my_pods():
         _ensure_pods_for_user_cliques(user_id)
         pod_model = Pod()
         pods = pod_model.find_active_by_member(user_id)
+        pods = _enrich_pods_with_member_names(pods, current_user_id=user_id)
         return jsonify({
             'pods': pods
         }), 200
@@ -127,6 +157,8 @@ def get_pod(pod_id: str):
                 'code': 403
             }), 403
         
+        user_model = User()
+        _enrich_pod_with_member_names(pod, user_model, current_user_id=user_id)
         return jsonify({
             'pod': pod
         }), 200

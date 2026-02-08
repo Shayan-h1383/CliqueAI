@@ -44,16 +44,16 @@ def create_app() -> Flask:
     app.register_blueprint(applications_bp)
     app.register_blueprint(invitations_bp)
     
-    # Initialize rate limiter
+    # Initialize rate limiter (disabled so polling / high traffic does not trigger 429)
     from flask_limiter import Limiter
     from flask_limiter.util import get_remote_address
     from backend.routes.matching import init_limiter
     limiter = Limiter(
         app=app,
         key_func=get_remote_address,
-        default_limits=["200 per day", "50 per hour"]
+        default_limits=["200 per day", "50 per hour"],
+        enabled=False,
     )
-    app.config['RATELIMIT_ENABLED'] = True
     init_limiter(limiter)
     
     # Initialize SocketIO

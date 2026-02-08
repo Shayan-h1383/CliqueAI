@@ -13,7 +13,7 @@
       <div v-else-if="invitations.length === 0" class="text-center py-12">
         <p class="text-gray-600 mb-4">You have no pending invitations.</p>
         <router-link
-          to="/find-match"
+          to="/dashboard"
           class="inline-block py-3 px-6 rounded-lg font-semibold text-white bg-primary hover:bg-primary/90"
         >
           Find your clique

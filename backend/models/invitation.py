@@ -103,12 +103,14 @@ class Invitation:
         invitee_id: str,
         application_id: Optional[str] = None,
     ) -> Optional[dict]:
-        """Find pending invitation from inviter to invitee (so invitee can accept/reject)."""
+        """Find pending invitation from inviter to invitee (so invitee can accept/reject). Scoped by application when provided."""
         query = {
             "inviter_id": ObjectId(inviter_id),
             "invitee_id": ObjectId(invitee_id),
             "status": "pending",
         }
+        if application_id is not None:
+            query["application_id"] = ObjectId(application_id)
         doc = self.collection.find_one(query)
         return self._normalize(doc)
 
@@ -118,14 +120,17 @@ class Invitation:
         user_id_b: str,
         application_id: Optional[str] = None,
     ) -> Optional[dict]:
-        """Find any invitation (any status) between two users (either direction)."""
+        """Find any invitation (any status) between two users (either direction). Scoped by application when provided."""
         oid_a, oid_b = ObjectId(user_id_a), ObjectId(user_id_b)
-        doc = self.collection.find_one({
+        query = {
             "$or": [
                 {"inviter_id": oid_a, "invitee_id": oid_b},
                 {"inviter_id": oid_b, "invitee_id": oid_a},
             ],
-        })
+        }
+        if application_id is not None:
+            query["application_id"] = ObjectId(application_id)
+        doc = self.collection.find_one(query)
         return self._normalize(doc)
 
     def find_by_clique_group_id(self, clique_group_id: str) -> List[dict]:

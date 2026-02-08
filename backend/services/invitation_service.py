@@ -104,23 +104,32 @@ class InvitationService:
             return {"accepted": False, "rejected": True, "invitation_id": pending_from_them["_id"]}
         return {"accepted": False, "rejected": True}
 
-    def _ensure_clique_and_pod(self, user_a: str, user_b: str, match_type: str) -> Dict:
+    def _ensure_clique_and_pod(
+        self,
+        user_a: str,
+        user_b: str,
+        match_type: str,
+        application_id: Optional[str] = None,
+    ) -> Dict:
         """
         After mutual accept (user_a, user_b): create or merge cliques, create pod if size >= 3.
+        Scoped by application_id so each application gets its own chat (clique/pod).
         Returns { clique, pod? }. Handles duplicate adds (e.g. X and Y both match Z - Z only added once).
         """
-        cliques_a = self.clique_model.find_by_member(user_a)
-        cliques_b = self.clique_model.find_by_member(user_b)
-        existing_both = self.clique_model.find_containing_both(user_a, user_b)
+        cliques_a = self.clique_model.find_by_member(user_a, application_id=application_id)
+        cliques_b = self.clique_model.find_by_member(user_b, application_id=application_id)
+        existing_both = self.clique_model.find_containing_both(
+            user_a, user_b, application_id=application_id
+        )
         if existing_both:
-            return {"clique": existing_both, "pod": self._pod_for_clique(existing_both)}
+            return {"clique": existing_both, "pod": self._pod_for_clique(existing_both, application_id)}
 
         # One clique contains both → already in same clique
         for c in cliques_a:
             if user_b in c.get("members", []):
-                return {"clique": c, "pod": self._pod_for_clique(c)}
+                return {"clique": c, "pod": self._pod_for_clique(c, application_id)}
 
-        # Find cliques containing only A or only B
+        # Find cliques containing only A or only B (already scoped by application_id above)
         only_a = [c for c in cliques_a if user_b not in (c.get("members") or [])]
         only_b = [c for c in cliques_b if user_a not in (c.get("members") or [])]
 
@@ -132,7 +141,7 @@ class InvitationService:
             target_members = set(target.get("members") or [])
             self.clique_model.merge_into(target["_id"], source["_id"])
             merged = self.clique_model.find_by_id(target["_id"])
-            pod = self._pod_for_clique(merged)
+            pod = self._pod_for_clique(merged, application_id)
             # If target had a pod, add any new members from source that aren't in the pod yet
             if pod:
                 pod_members = set(pod.get("members") or [])
@@ -151,7 +160,7 @@ class InvitationService:
             if user_b not in (c.get("members") or []):
                 self.clique_model.add_member(c["_id"], user_b)
             updated = self.clique_model.find_by_id(c["_id"])
-            pod = self._pod_for_clique(updated)
+            pod = self._pod_for_clique(updated, application_id)
             if pod and user_b not in (pod.get("members") or []):
                 self.pod_service.add_member_to_pod(pod["_id"], user_b)
                 pod = self.pod_service.pod_model.find_by_id(pod["_id"])
@@ -163,18 +172,26 @@ class InvitationService:
             if user_a not in (c.get("members") or []):
                 self.clique_model.add_member(c["_id"], user_a)
             updated = self.clique_model.find_by_id(c["_id"])
-            pod = self._pod_for_clique(updated)
+            pod = self._pod_for_clique(updated, application_id)
             if pod and user_a not in (pod.get("members") or []):
                 self.pod_service.add_member_to_pod(pod["_id"], user_a)
                 pod = self.pod_service.pod_model.find_by_id(pod["_id"])
             return {"clique": updated, "pod": pod}
 
-        # New clique of 2
-        clique_id = self.clique_model.create([user_a, user_b], match_type=match_type)
+        # New clique of 2 (for this application)
+        clique_id = self.clique_model.create(
+            [user_a, user_b],
+            match_type=match_type,
+            application_id=application_id,
+        )
         clique = self.clique_model.find_by_id(clique_id)
-        return {"clique": clique, "pod": self._pod_for_clique(clique)}
+        return {"clique": clique, "pod": self._pod_for_clique(clique, application_id)}
 
-    def _pod_for_clique(self, clique: dict) -> Optional[dict]:
+    def _pod_for_clique(
+        self,
+        clique: dict,
+        application_id: Optional[str] = None,
+    ) -> Optional[dict]:
         """If clique has 3+ members and no pod_id, create pod and set pod_id. Return pod if chatable."""
         members = clique.get("members") or []
         if len(members) < 3:
@@ -182,11 +199,14 @@ class InvitationService:
         pod_id = clique.get("pod_id")
         if pod_id:
             return self.pod_service.pod_model.find_by_id(pod_id)
-        # Create pod for this clique
+        # Use application_id from clique if not passed (e.g. from merged clique)
+        app_id = application_id or clique.get("application_id")
+        # Create pod for this clique (one chat per application)
         pod = self.pod_service.create_pod(
             user_id=members[0],
             match_type=clique.get("match_type", "evolve"),
             member_ids=members,
+            application_id=app_id,
         )
         self.clique_model.set_pod_id(clique["_id"], pod["_id"])
         return pod
@@ -222,12 +242,16 @@ class InvitationService:
                 user_id=inviter_id,
                 match_type=inv["match_type"],
                 member_ids=member_ids,
+                application_id=inv.get("application_id"),
             )
             return {"accepted": True, "pod": pod, "clique": None}
 
-        # New: single invitation = mutual accept → clique
+        # New: single invitation = mutual accept → clique (scoped by application for separate chats)
         inviter_id = inv["inviter_id"]
-        result = self._ensure_clique_and_pod(inviter_id, invitee_id, inv["match_type"])
+        application_id = inv.get("application_id")
+        result = self._ensure_clique_and_pod(
+            inviter_id, invitee_id, inv["match_type"], application_id=application_id
+        )
         return {"accepted": True, "pod": result.get("pod"), "clique": result.get("clique")}
 
     def reject_invitation(self, invitation_id: str, invitee_id: str) -> None:
@@ -255,12 +279,12 @@ class InvitationService:
             raise ValueError("Clique not found")
         members = clique.get("members") or []
         if new_member_id in members:
-            return {"clique": clique, "pod": self._pod_for_clique(clique)}
+            return {"clique": clique, "pod": self._pod_for_clique(clique, clique.get("application_id"))}
         if len(members) >= MAX_CLIQUE_MEMBERS:
             raise ValueError(f"Clique already has maximum {MAX_CLIQUE_MEMBERS} members")
         self.clique_model.add_member(clique_id, new_member_id)
         updated = self.clique_model.find_by_id(clique_id)
-        pod = self._pod_for_clique(updated)
+        pod = self._pod_for_clique(updated, updated.get("application_id"))
         if pod and new_member_id not in (pod.get("members") or []):
             self.pod_service.add_member_to_pod(pod["_id"], new_member_id)
             updated_pod = self.pod_service.pod_model.find_by_id(pod["_id"])

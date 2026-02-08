@@ -22,6 +22,7 @@ class CliqueSchema(BaseModel):
     )
     pod_id: Optional[str] = Field(default=None, description="Set when size >= 3 for chat")
     match_type: str = Field(default="evolve", description="evolve, enjoy, or support")
+    application_id: Optional[str] = Field(default=None, description="Application this clique belongs to (one chat per application)")
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
 
@@ -54,7 +55,12 @@ class Clique:
         except Exception:
             pass
 
-    def create(self, member_ids: List[str], match_type: str = "evolve") -> str:
+    def create(
+        self,
+        member_ids: List[str],
+        match_type: str = "evolve",
+        application_id: Optional[str] = None,
+    ) -> str:
         """Create a clique with exactly 2 members (called on mutual accept)."""
         member_ids = list(dict.fromkeys(member_ids))  # dedupe
         if len(member_ids) < MIN_CLIQUE_MEMBERS or len(member_ids) > MAX_CLIQUE_MEMBERS:
@@ -64,6 +70,7 @@ class Clique:
             "members": [ObjectId(uid) for uid in member_ids],
             "pod_id": None,
             "match_type": match_type,
+            "application_id": ObjectId(application_id) if application_id else None,
             "created_at": now,
             "updated_at": now,
         }
@@ -77,16 +84,41 @@ class Clique:
         except Exception:
             return None
 
-    def find_by_member(self, user_id: str) -> List[dict]:
-        """Find all cliques that contain this user."""
-        cursor = self.collection.find({"members": ObjectId(user_id)})
+    def find_by_member(
+        self,
+        user_id: str,
+        application_id: Optional[str] = None,
+    ) -> List[dict]:
+        """Find all cliques that contain this user, optionally scoped by application."""
+        query = {"members": ObjectId(user_id)}
+        if application_id is not None:
+            query["application_id"] = ObjectId(application_id)
+        else:
+            query["$or"] = [
+                {"application_id": None},
+                {"application_id": {"$exists": False}},
+            ]
+        cursor = self.collection.find(query)
         return [self._normalize(d) for d in cursor if d]
 
-    def find_containing_both(self, user_id_a: str, user_id_b: str) -> Optional[dict]:
-        """Find a clique that contains both users (for merging)."""
-        doc = self.collection.find_one({
+    def find_containing_both(
+        self,
+        user_id_a: str,
+        user_id_b: str,
+        application_id: Optional[str] = None,
+    ) -> Optional[dict]:
+        """Find a clique that contains both users, optionally scoped by application."""
+        query = {
             "members": {"$all": [ObjectId(user_id_a), ObjectId(user_id_b)]},
-        })
+        }
+        if application_id is not None:
+            query["application_id"] = ObjectId(application_id)
+        else:
+            query["$or"] = [
+                {"application_id": None},
+                {"application_id": {"$exists": False}},
+            ]
+        doc = self.collection.find_one(query)
         return self._normalize(doc)
 
     def add_member(self, clique_id: str, user_id: str) -> bool:
@@ -161,4 +193,6 @@ class Clique:
         doc["members"] = [str(m) for m in doc.get("members", [])]
         if doc.get("pod_id"):
             doc["pod_id"] = str(doc["pod_id"])
+        if doc.get("application_id"):
+            doc["application_id"] = str(doc["application_id"])
         return doc

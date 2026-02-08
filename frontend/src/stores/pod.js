@@ -29,7 +29,9 @@ export const usePodStore = defineStore('pod', () => {
 
   async function fetchMyPods() {
     try {
-      const response = await api.get('/pods/mine')
+      const response = await api.get('/pods/mine', {
+        params: { _: Date.now() }
+      })
       return response.data?.pods || []
     } catch (error) {
       console.error('Failed to fetch pods:', error)
