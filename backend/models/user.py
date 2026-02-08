@@ -227,6 +227,40 @@ class User:
         except Exception:
             return False
     
+    def update_username(self, user_id: str, username: str) -> bool:
+        """
+        Update user's username.
+        Does not update if username is taken by another user.
+
+        Args:
+            user_id: User ID as string
+            username: New username
+
+        Returns:
+            bool: True if update was successful, False otherwise
+
+        Raises:
+            ValueError: If username is invalid or already taken
+        """
+        username = (username or "").strip()
+        if not username or len(username) < 1:
+            raise ValueError("Username cannot be empty")
+        if len(username) > 50:
+            raise ValueError("Username must be at most 50 characters")
+
+        existing = self.collection.find_one({"username": username})
+        if existing and str(existing["_id"]) != user_id:
+            raise ValueError("Username is already taken")
+
+        try:
+            result = self.collection.update_one(
+                {"_id": ObjectId(user_id)},
+                {"$set": {"username": username}}
+            )
+            return result.modified_count > 0
+        except DuplicateKeyError:
+            raise ValueError("Username is already taken")
+
     def set_active_pod(self, user_id: str, pod_id: Optional[str]) -> bool:
         """
         Set or clear user's active pod.

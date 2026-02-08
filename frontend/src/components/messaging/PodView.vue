@@ -1,8 +1,8 @@
 <template>
-  <div class="flex flex-col h-full">
+  <div class="flex flex-col flex-1 min-h-0">
     <!-- Header with Leave Pod button -->
-    <div class="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-200">
-      <h2 class="text-xl font-bold text-gray-800">Pod Chat</h2>
+    <div class="flex items-center justify-between px-3 sm:px-4 py-3 bg-white border-b border-gray-200 shrink-0">
+      <h2 class="text-lg sm:text-xl font-bold text-gray-800">Pod Chat</h2>
       <Button
         variant="outline"
         size="sm"
@@ -13,7 +13,7 @@
     </div>
 
     <!-- Icebreaker -->
-    <div class="px-4 pb-4">
+    <div class="px-3 sm:px-4 pb-4 shrink-0">
       <IcebreakerCard :icebreaker="pod.gemini_icebreaker || 'You all share common interests!'" />
     </div>
 

@@ -53,6 +53,20 @@ export const authService = {
   },
 
   /**
+   * Update current user's username
+   * @param {string} username
+   * @returns {Promise<{user: object}>}
+   */
+  async updateUsername(username) {
+    try {
+      const response = await api.patch('/auth/me', { username })
+      return response.data
+    } catch (error) {
+      throw this.handleError(error)
+    }
+  },
+
+  /**
    * Logout user
    * @returns {Promise<void>}
    */

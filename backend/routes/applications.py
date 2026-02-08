@@ -130,13 +130,20 @@ def _invitation_status(
     current_user_id: str,
     other_user_id: str,
     application_id: Optional[str] = None,
+    other_application_id: Optional[str] = None,
 ) -> str:
     """Returns: none, pending_them, pending_me, accepted, rejected. Scoped by application_id when provided."""
     if not other_user_id:
         return "none"
-    # If we're in the same clique (or pod), we're connected regardless of invitation state
+    # Show connected if they're in a clique for this application OR the other user's application (same match, two app docs)
     clique_model = Clique()
-    if clique_model.find_containing_both(current_user_id, other_user_id):
+    if clique_model.find_containing_both(
+        current_user_id, other_user_id, application_id=application_id
+    ):
+        return "accepted"
+    if other_application_id and clique_model.find_containing_both(
+        current_user_id, other_user_id, application_id=other_application_id
+    ):
         return "accepted"
     inv_model = Invitation()
     inv = inv_model.find_any_between(current_user_id, other_user_id, application_id=application_id)
@@ -172,7 +179,12 @@ def _enrich_linked(application: dict, current_user_id: str) -> dict:
             'username': user.get('username', 'Unknown') if user else 'Unknown',
             'profile_pic_url': user.get('profile', {}).get('profile_pic_url') if user else None,
             'payload': other.get('payload') if other else None,
-            'invitation_status': _invitation_status(current_user_id, other_user_id, application_id),
+            'invitation_status': _invitation_status(
+                current_user_id,
+                other_user_id,
+                application_id=application_id,
+                other_application_id=app_id,
+            ),
         })
     application['linked_applications'] = enriched
     return application

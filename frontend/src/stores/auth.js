@@ -45,6 +45,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function updateUsername(newUsername) {
+    const data = await authService.updateUsername(newUsername)
+    user.value = data.user
+    return data.user
+  }
+
   function logout() {
     token.value = null
     user.value = null
@@ -78,6 +84,7 @@ export const useAuthStore = defineStore('auth', () => {
     register,
     loadUser,
     logout,
+    updateUsername,
     setToken,
     setUser,
   }

@@ -16,8 +16,9 @@
       </Card>
     </div>
 
-    <div v-else-if="pod" class="max-w-4xl mx-auto bg-white min-h-screen flex flex-col">
-      <PodView
+    <div v-else-if="pod" class="h-[calc(100vh-3.5rem)] lg:h-screen flex flex-col bg-gray-50">
+      <div class="flex flex-col flex-1 min-h-0 w-full overflow-hidden bg-white">
+        <PodView
         :pod="pod"
         :messages="messages"
         :pod-members="podMembers"
@@ -25,6 +26,7 @@
         @send="handleSendMessage"
         @leave="handleLeavePod"
       />
+      </div>
     </div>
   </div>
 </template>

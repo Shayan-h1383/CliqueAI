@@ -24,6 +24,11 @@ class LoginRequest(BaseModel):
     password: str = Field(..., min_length=1)
 
 
+class UpdateUsernameRequest(BaseModel):
+    """Request schema for updating username."""
+    username: str = Field(..., min_length=1, max_length=50)
+
+
 @auth_bp.route('/register', methods=['POST'])
 def register():
     """Register a new user."""
@@ -173,26 +178,80 @@ def get_current_user():
     """Get current authenticated user's profile."""
     try:
         user_id = g.current_user_id
-        
+
         user_model = User()
         user = user_model.find_by_id(user_id)
-        
+
         if not user:
             return jsonify({
                 'error': 'User not found',
                 'code': 404
             }), 404
-        
+
         # Remove sensitive data
         user.pop('password_hash', None)
-        
+
         return jsonify({
             'user': user
         }), 200
-    
+
     except Exception as e:
         return jsonify({
             'error': f'Failed to get user profile: {str(e)}',
+            'code': 500
+        }), 500
+
+
+@auth_bp.route('/me', methods=['PATCH'])
+@require_auth
+def update_current_user():
+    """Update current authenticated user (e.g. username)."""
+    try:
+        user_id = g.current_user_id
+        data = request.get_json()
+
+        if not data or 'username' not in data:
+            return jsonify({
+                'error': 'Username is required',
+                'code': 400
+            }), 400
+
+        try:
+            update_data = UpdateUsernameRequest(**data)
+        except ValidationError as e:
+            return jsonify({
+                'error': 'Validation failed',
+                'code': 400,
+                'details': e.errors()
+            }), 400
+
+        user_model = User()
+
+        try:
+            user_model.update_username(user_id, update_data.username)
+        except ValueError as e:
+            return jsonify({
+                'error': str(e),
+                'code': 400
+            }), 400
+
+        user = user_model.find_by_id(user_id)
+        if not user:
+            return jsonify({
+                'error': 'User not found',
+                'code': 404
+            }), 404
+
+        user.pop('password_hash', None)
+
+        return jsonify({
+            'message': 'Username updated successfully',
+            'user': user
+        }), 200
+
+    except Exception as e:
+        return jsonify({
+            'error': f'Failed to update user: {str(e)}',
             'code': 500
         }), 500
 

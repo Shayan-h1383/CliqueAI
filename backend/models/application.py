@@ -1,4 +1,5 @@
 """Clique Application model: one submission per goal (evolve/enjoy/support) with filter and vector."""
+import re
 from datetime import datetime
 from typing import Optional, List, Any
 from bson import ObjectId
@@ -124,11 +125,11 @@ class CliqueApplication:
         exclude_application_id: str,
         exclude_user_id: Optional[str] = None,
     ) -> List[dict]:
-        """Find ALL applications with same goal, city, and area (hard filter). Excludes given app, same user, and rejected."""
+        """Find ALL applications with same goal, city, and area (hard filter). City and area match case-insensitively. Excludes given app, same user, and rejected."""
         query = {
             "filter.goal": goal,
-            "filter.city": city,
-            "filter.area": area,
+            "filter.city": {"$regex": f"^{re.escape(city.strip())}$", "$options": "i"},
+            "filter.area": {"$regex": f"^{re.escape(area.strip())}$", "$options": "i"},
             "status": {"$in": ["pending", "matched"]},
             "_id": {"$ne": ObjectId(exclude_application_id)},
         }

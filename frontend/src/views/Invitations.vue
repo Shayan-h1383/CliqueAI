@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 sm:px-6 py-6 sm:py-8">
     <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Clique invitations</h1>
+      <div class="text-center mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">Clique invitations</h1>
         <p class="text-gray-600">Accept or reject clique invitations from others</p>
       </div>
 
@@ -24,14 +24,14 @@
         <div
           v-for="inv in invitations"
           :key="inv._id"
-          class="bg-white rounded-xl shadow-sm border border-gray-200 p-6"
+          class="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6"
         >
-          <div class="flex items-center justify-between flex-wrap gap-4">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p class="font-semibold text-gray-800">{{ inv.inviter_username || 'Someone' }} wants to form a clique with you</p>
               <p class="text-sm text-gray-500 mt-1 capitalize">{{ inv.match_type }}</p>
             </div>
-            <div class="flex gap-2">
+            <div class="flex gap-2 flex-shrink-0">
               <button
                 type="button"
                 class="py-2 px-4 rounded-lg font-medium text-white bg-primary hover:bg-primary/90"

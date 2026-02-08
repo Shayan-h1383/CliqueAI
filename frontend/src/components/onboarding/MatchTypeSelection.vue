@@ -1,11 +1,11 @@
 <template>
   <div class="space-y-6">
-    <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-gray-800 mb-2">What are you looking for?</h2>
+    <div class="text-center mb-6 sm:mb-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">What are you looking for?</h2>
       <p class="text-gray-600">Choose the type of connection you want to make</p>
     </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
       <Card
         :clickable="true"
         :hover="true"
@@ -15,8 +15,8 @@
         ]"
         @click="selectType('evolve')"
       >
-        <div class="text-5xl mb-4">🎯</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Evolve</h3>
+        <div class="text-4xl sm:text-5xl mb-4">🎯</div>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Evolve</h3>
         <p class="text-gray-600">Grow and develop together</p>
       </Card>
 
@@ -29,8 +29,8 @@
         ]"
         @click="selectType('enjoy')"
       >
-        <div class="text-5xl mb-4">💙</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Enjoy</h3>
+        <div class="text-4xl sm:text-5xl mb-4">💙</div>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Enjoy</h3>
         <p class="text-gray-600">Connect over shared interests</p>
       </Card>
 
@@ -43,8 +43,8 @@
         ]"
         @click="selectType('support')"
       >
-        <div class="text-5xl mb-4">🤝</div>
-        <h3 class="text-xl font-bold text-gray-800 mb-2">Support</h3>
+        <div class="text-4xl sm:text-5xl mb-4">🤝</div>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2">Support</h3>
         <p class="text-gray-600">Get support for challenges</p>
       </Card>
     </div>

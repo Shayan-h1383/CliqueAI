@@ -1,7 +1,7 @@
 """Flask application initialization and configuration."""
 import os
 import logging
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 from flask_socketio import SocketIO
 from dotenv import load_dotenv
@@ -113,6 +113,16 @@ def create_app() -> Flask:
             'code': 500
         }), 500
     
+    # Serve goal images from backend/images
+    images_dir = os.path.join(os.path.dirname(__file__), 'images')
+
+    @app.route('/api/images/<path:filename>', methods=['GET'])
+    def serve_image(filename):
+        """Serve image files from backend/images (with caching). Prefer frontend public/images for speed."""
+        response = send_from_directory(images_dir, filename)
+        response.headers['Cache-Control'] = 'public, max-age=86400'
+        return response
+
     # Health check endpoint
     @app.route('/health', methods=['GET'])
     def health_check():

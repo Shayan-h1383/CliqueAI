@@ -5,9 +5,9 @@
       isSelected ? 'ring-4 ring-primary bg-primary/5' : 'hover:shadow-lg'
     ]"
   >
-    <div class="flex items-start justify-between mb-4">
-      <div class="flex-1">
-        <h3 class="text-xl font-bold text-gray-800 mb-1">{{ match.username }}</h3>
+    <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-4">
+      <div class="flex-1 min-w-0">
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-1 truncate">{{ match.username }}</h3>
         <div class="flex items-center space-x-2">
           <span class="text-sm font-medium text-primary">
             {{ similarityPercentage }}% match
@@ -20,7 +20,7 @@
           </div>
         </div>
       </div>
-      <label class="flex items-center cursor-pointer ml-4">
+      <label class="flex items-center cursor-pointer sm:ml-4 shrink-0">
         <input
           type="checkbox"
           :checked="isSelected"

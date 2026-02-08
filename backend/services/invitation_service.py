@@ -65,11 +65,18 @@ class InvitationService:
         """
         if my_id == other_user_id:
             raise ValueError("Cannot respond to yourself")
+        # Prefer pending from them for this application; else any pending from them (they may have sent from their app doc)
         pending_from_them = self.invitation_model.find_pending_from_inviter_to_invitee(
             inviter_id=other_user_id,
             invitee_id=my_id,
             application_id=application_id,
         )
+        if not pending_from_them:
+            pending_from_them = self.invitation_model.find_pending_from_inviter_to_invitee(
+                inviter_id=other_user_id,
+                invitee_id=my_id,
+                application_id=None,
+            )
         if accept:
             if pending_from_them:
                 # They invited me; accepting creates mutual → clique

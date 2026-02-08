@@ -1,9 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 sm:px-6 py-6 sm:py-8">
     <div class="max-w-6xl mx-auto">
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Your Suggested Clique</h1>
-        <p class="text-gray-600">Select 2 people to create your pod (you'll be the 3rd member)</p>
+      <div class="text-center mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">Your Suggested Clique</h1>
+        <p class="text-gray-600 text-sm sm:text-base">Select 2 people to create your pod (you'll be the 3rd member)</p>
       </div>
 
       <MatchResults

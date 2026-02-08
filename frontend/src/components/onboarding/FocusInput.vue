@@ -1,7 +1,7 @@
 <template>
   <div class="space-y-6">
-    <div class="text-center mb-8">
-      <h2 class="text-3xl font-bold text-gray-800 mb-2">Tell us about yourself</h2>
+    <div class="text-center mb-6 sm:mb-8">
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-2">Tell us about yourself</h2>
       <p class="text-gray-600">Help us find your perfect clique</p>
     </div>
 
@@ -13,7 +13,7 @@
         v-model="focusText"
         :placeholder="placeholder"
         :maxlength="500"
-        rows="8"
+        rows="6"
         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary resize-none text-lg"
         @input="handleInput"
       ></textarea>

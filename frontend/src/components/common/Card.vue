@@ -1,12 +1,12 @@
 <template>
   <div :class="cardClasses">
-    <div v-if="$slots.header" class="px-6 py-4 border-b border-gray-200">
+    <div v-if="$slots.header" class="px-4 sm:px-6 py-4 border-b border-gray-200">
       <slot name="header"></slot>
     </div>
     <div :class="bodyClasses">
       <slot></slot>
     </div>
-    <div v-if="$slots.footer" class="px-6 py-4 border-t border-gray-200">
+    <div v-if="$slots.footer" class="px-4 sm:px-6 py-4 border-t border-gray-200">
       <slot name="footer"></slot>
     </div>
   </div>
@@ -42,9 +42,9 @@ const cardClasses = computed(() => {
 const bodyClasses = computed(() => {
   const paddings = {
     none: '',
-    sm: 'p-4',
-    md: 'p-6',
-    lg: 'p-8',
+    sm: 'p-3 sm:p-4',
+    md: 'p-4 sm:p-6',
+    lg: 'p-6 sm:p-8',
   }
   return paddings[props.padding]
 })

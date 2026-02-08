@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4">
-    <Card class="w-full max-w-md">
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-primary mb-2">cliqueAI</h1>
+  <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 sm:px-6 py-6 sm:py-8">
+    <Card class="w-full max-w-md mx-2">
+      <div class="text-center mb-6 sm:mb-8">
+        <h1 class="text-3xl sm:text-4xl font-bold text-primary mb-2">cliqueAI</h1>
         <p class="text-gray-600">Stop Broadcasting. Start Connecting.</p>
       </div>
 

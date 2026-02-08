@@ -1,8 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 py-8">
+  <div class="min-h-screen bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 px-4 sm:px-6 py-6 sm:py-8">
     <div class="max-w-4xl mx-auto">
-      <div class="text-center mb-8">
-        <h1 class="text-4xl font-bold text-gray-800 mb-2">Your clique applications</h1>
+      <div class="text-center mb-6 sm:mb-8">
+        <h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">Your clique applications</h1>
         <p class="text-gray-600">Click an application to see your suggested matches</p>
       </div>
 
@@ -28,14 +28,14 @@
         >
           <button
             type="button"
-            class="w-full text-left px-6 py-4 flex items-center justify-between hover:bg-gray-50"
+            class="w-full text-left px-4 sm:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 hover:bg-gray-50"
             @click="selectedId = selectedId === app._id ? null : app._id"
           >
-            <div class="flex items-center gap-3">
-              <span class="text-2xl">{{ goalIcon(app.filter?.goal) }}</span>
-              <div>
+            <div class="flex items-center gap-3 min-w-0">
+              <span class="text-xl sm:text-2xl shrink-0">{{ goalIcon(app.filter?.goal) }}</span>
+              <div class="min-w-0">
                 <span class="font-semibold text-gray-800 capitalize">{{ app.filter?.goal }}</span>
-                <span class="text-gray-500 text-sm ml-2">· {{ app.filter?.city }} · {{ app.payload?.area }}</span>
+                <span class="text-gray-500 text-sm sm:ml-2 block sm:inline">· {{ app.filter?.city }} · {{ app.payload?.area }}</span>
               </div>
             </div>
             <div class="flex items-center gap-2">
@@ -59,7 +59,7 @@
             </div>
           </button>
 
-          <div v-if="selectedId === app._id" class="border-t border-gray-200 px-6 py-4 bg-gray-50/50">
+          <div v-if="selectedId === app._id" class="border-t border-gray-200 px-4 sm:px-6 py-4 bg-gray-50/50">
             <!-- Full application payload -->
             <div class="mb-4 p-4 bg-white rounded-lg border border-gray-200">
               <p class="text-sm font-medium text-gray-700 mb-2">Your application</p>
