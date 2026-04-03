@@ -1,33 +1,54 @@
-# Hacketon - Database Schema & Matching Algorithm Foundation
+# cliqueAI
 
-This project implements a MongoDB-based database schema and semantic matching algorithm using Google's Gemini API for embeddings.
+Hacketon is a web application that connects people into small, time-limited groups called pods for shared focus areas. Users sign up, describe what they want to work on or connect about, and the system finds semantically similar people using vector embeddings. They can invite each other, form pods, and chat in real time while the pod is active.
 
-## Project Structure
+## What it is
+
+The product combines:
+
+- **Accounts and profiles** stored in MongoDB, with preferences and a free-text focus that drives matching.
+- **Semantic matching** powered by Google Gemini: user focus text is turned into an embedding vector; candidates with the same match type (goal category) are ranked by cosine similarity so people with meaningfully similar intent surface together.
+- **Pods and invitations** so matched users can coordinate and join a pod (small member cap, time-bounded lifetime).
+- **Messaging** over HTTP and WebSockets (Flask-SocketIO) for live pod chat.
+
+The **backend** is a Flask API with JWT auth, REST routes for auth, matching, pods, applications, invitations, and messages, plus Socket.IO for realtime updates. The **frontend** is a Vue 3 single-page app (Vite, Pinia, Tailwind CSS) that implements onboarding, matching, invitations, and pod chat against the API.
+
+## How it works
+
+1. A user registers and completes onboarding, choosing a match type (`evolve`, `enjoy`, or `support`) and text that describes their current focus.
+2. The backend calls Gemini to embed that focus text and stores the vector on the user for matching.
+3. `MatchingService` loads other users with the same match type who are available, computes cosine similarity between embeddings, and returns the top matches.
+4. Users send invitations or accept flows as implemented in the invitation and application routes; pods are created with metadata and expiry.
+5. Messages are stored in MongoDB and pushed to clients over Socket.IO so everyone in a pod sees new messages without full page reloads.
+
+Configuration is driven by environment variables (see `.env.example`): MongoDB URI, JWT secret, Gemini API key, and CORS origins for the Vue dev server.
+
+## Project structure
 
 ```
 backend/
-├── config/
-│   └── database.py          # MongoDB connection setup
-├── models/
-│   ├── __init__.py
-│   ├── user.py              # User model with Pydantic/MongoDB schemas
-│   ├── pod.py               # Pod model
-│   └── message.py           # Message model
-├── services/
-│   ├── __init__.py
-│   ├── gemini_service.py    # Gemini API wrapper for embeddings & chat
-│   └── matching_service.py  # Core matching algorithm logic
-└── utils/
-    ├── __init__.py
-    └── embeddings.py        # Helper functions for vector operations
-tests/
-├── __init__.py
-├── test_database.py         # Database connection and CRUD tests
-├── test_embeddings.py       # Embedding and cosine similarity tests
-└── test_matching.py         # Matching algorithm tests
+├── config/           # MongoDB connection
+├── models/           # User, pod, message, invitation, application, etc.
+├── routes/           # Flask blueprints (auth, matching, pods, messages, ...)
+├── services/         # Gemini, matching, pods, invitations, auth, ...
+├── tasks/            # Matching-related jobs
+└── utils/            # Embeddings helpers
+frontend/
+├── src/
+│   ├── components/   # Onboarding, matching, messaging, common UI
+│   ├── views/        # Pages (login, dashboard, pod chat, ...)
+│   ├── stores/       # Pinia stores
+│   ├── services/     # API client
+│   └── router/
+├── vite.config.js    # Dev server proxies /api to Flask
+└── package.json
+tests/                # pytest suite (mocked external APIs where appropriate)
+scripts/              # DB checks, seed data, maintenance scripts
 ```
 
 ## Setup
+
+### Backend
 
 1. **Install dependencies:**
    ```bash
@@ -35,92 +56,80 @@ tests/
    ```
 
 2. **Set up MongoDB:**
-   - Install MongoDB Community: https://www.mongodb.com/try/download/community
-   - Start MongoDB: `mongod` (or `net start MongoDB` on Windows)
+   - Install [MongoDB Community](https://www.mongodb.com/try/download/community)
+   - Start MongoDB: `mongod` (on Windows: `net start MongoDB` if installed as a service)
    - Verify: `python scripts/check_db.py`
 
-3. **Configure environment variables:**
+3. **Configure environment variables:**  
    Copy `.env.example` to `.env` and set:
    ```
    MONGODB_URI=mongodb://localhost:27017/hacketon
    JWT_SECRET_KEY=your-secret-key-change-in-production
    GEMINI_API_KEY=your_gemini_api_key_here
+   CORS_ORIGINS=http://localhost:5173,http://localhost:3000
    ```
 
-4. **Run tests:**
+4. **Run the API** (from the project root):
    ```bash
-   pytest tests/ -v
+   python -m backend.app
+   ```
+   Defaults to port `5000` unless `PORT` is set. Health check: `GET /health`.
+
+### Frontend
+
+1. **Install dependencies:**
+   ```bash
+   cd frontend
+   npm install
    ```
 
-## Database Schema
+2. **Run the dev server** (with the backend running):
+   ```bash
+   npm run dev
+   ```
+   Vite is configured to proxy `/api` to `http://localhost:5000`. Adjust `frontend/vite.config.js` if your API port differs.
 
-### Users Collection
-- `_id`: ObjectId
-- `username`: string (unique, required)
-- `email`: string (unique, required)
-- `password_hash`: string (required)
-- `created_at`: datetime
-- `active_pod_id`: ObjectId (nullable)
-- `profile`: object
-  - `interests`: array of strings
-  - `work_area`: string
-  - `current_goals`: array of strings
-  - `struggles`: array of strings
-- `matching_preferences`: object
-  - `match_type`: enum ("friendship", "goal", "issues")
-  - `current_focus_text`: string
-  - `focus_embedding`: array of floats (Gemini embedding vector)
-  - `last_updated`: datetime
+3. **Production build:**
+   ```bash
+   npm run build
+   ```
+   Output goes to `frontend/dist/` (ignored by git).
 
-### Pods Collection
-- `_id`: ObjectId
-- `pod_type`: enum ("friendship", "goal", "issues")
-- `members`: array of ObjectIds (max 3)
-- `created_at`: datetime
-- `expires_at`: datetime (48 hours from creation)
-- `is_active`: boolean
-- `gemini_icebreaker`: string
-- `focus_context`: string
-
-### Messages Collection
-- `_id`: ObjectId
-- `pod_id`: ObjectId (reference to Pods)
-- `sender_id`: ObjectId (reference to Users)
-- `content`: string
-- `timestamp`: datetime
-- `read_by`: array of ObjectIds
-
-## Matching Algorithm
-
-The `find_matches()` function in `MatchingService`:
-
-1. Accepts `user_id`, `match_type`, and `focus_text`
-2. Generates a Gemini embedding for the `focus_text`
-3. Stores the embedding in the user's `matching_preferences.focus_embedding`
-4. Queries MongoDB for candidates with:
-   - Same `match_type`
-   - No active pod (`active_pod_id` is null)
-   - Different `_id` from current user
-   - Valid `focus_embedding`
-5. Calculates cosine similarity between user's embedding and all candidate embeddings
-6. Returns top 4 matches sorted by similarity score (descending)
-
-## Gemini Service
-
-The `GeminiService` provides:
-- `get_embedding(text)`: Generates embeddings using `models/embedding-001`
-- `generate_icebreaker(user_profiles, match_type)`: Generates icebreaker text using `gemini-1.5-pro`
-
-## Testing
-
-All tests use mocked API calls to avoid external dependencies during testing. Run tests with:
+### Tests
 
 ```bash
-pytest
+pytest tests/ -v
 ```
 
-Test coverage includes:
-- Database connection and CRUD operations
-- Embedding generation and cosine similarity calculations
-- Matching algorithm with various edge cases (no matches, less than 4 matches, etc.)
+Tests mock external APIs where needed so CI and local runs do not require live Gemini calls.
 
+## Database schema (overview)
+
+### Users
+
+- Identifiers, credentials, profile fields (interests, work area, goals, struggles).
+- `matching_preferences`: `match_type` (`evolve` | `enjoy` | `support`), focus text, `focus_embedding` (Gemini vector), timestamps.
+- `active_pod_id` when the user is in an active pod.
+
+### Pods
+
+- `pod_type` aligned with match type, member list, creation and expiry times, activity flags, optional Gemini-generated icebreaker and focus context.
+
+### Messages
+
+- Linked to `pod_id` and `sender_id`, content, timestamp, read receipts.
+
+(Exact fields are defined in the Pydantic/Mongo models under `backend/models/`.)
+
+## Matching algorithm
+
+The `find_matches()` flow in `MatchingService`:
+
+1. Takes `user_id`, `match_type`, and `focus_text`.
+2. Generates a Gemini embedding for `focus_text` and persists it on the user.
+3. Queries candidates with the same `match_type`, valid embeddings, not in an active pod, excluding self.
+4. Ranks by cosine similarity and returns the top matches (up to four).
+
+## Gemini usage
+
+`GeminiService` provides embedding generation for matching and can generate icebreaker copy for pods using the configured Gemini models (see `backend/services/gemini_service.py`).
