@@ -1,17 +1,31 @@
-# cliqueAI
+# CliqueAI — semantic matching into small, time-limited "pods"
 
-Hacketon is a web application that connects people into small, time-limited groups called pods for shared focus areas. Users sign up, describe what they want to work on or connect about, and the system finds semantically similar people using vector embeddings. They can invite each other, form pods, and chat in real time while the pod is active.
+**Built over a hackathon weekend (Feb 2026)** · Sole developer · **Stack:** Python · Flask · Flask-SocketIO · MongoDB · Google Gemini embeddings · NumPy · Vue 3 · Pinia · Vite · Tailwind · pytest
 
-## What it is
+CliqueAI puts people into small groups ("pods") with others who want to work on, talk about or get support for the same thing. Instead of keyword tags, it compares the **meaning** of what users write, using Gemini embeddings and cosine similarity, then lets matched users form a pod and chat in real time while it is active.
 
-The product combines:
+## Highlights
 
-- **Accounts and profiles** stored in MongoDB, with preferences and a free-text focus that drives matching.
-- **Semantic matching** powered by Google Gemini: user focus text is turned into an embedding vector; candidates with the same match type (goal category) are ranked by cosine similarity so people with meaningfully similar intent surface together.
-- **Pods and invitations** so matched users can coordinate and join a pod (small member cap, time-bounded lifetime).
-- **Messaging** over HTTP and WebSockets (Flask-SocketIO) for live pod chat.
+- **Semantic matching:** a user's free-text focus is embedded with Gemini; candidates with the same goal type (`evolve`, `enjoy`, `support`) who are not already in a pod are ranked by cosine similarity, and the top 4 are returned.
+- **Real-time pod chat** over WebSockets (Flask-SocketIO); messages are stored in MongoDB with read receipts.
+- **Pods with a lifetime:** a member cap, an expiry time and an optional Gemini-generated icebreaker.
+- **Secure API:** JWT auth, rate limiting (Flask-Limiter), CORS and Pydantic-validated models.
+- **74 pytest tests** covering auth, database, embeddings, matching, messages, pods and an integration flow, with Gemini mocked so tests run offline.
 
-The **backend** is a Flask API with JWT auth, REST routes for auth, matching, pods, applications, invitations, and messages, plus Socket.IO for realtime updates. The **frontend** is a Vue 3 single-page app (Vite, Pinia, Tailwind CSS) that implements onboarding, matching, invitations, and pod chat against the API.
+## Architecture
+
+```mermaid
+flowchart LR
+    V[Vue 3 SPA<br/>Pinia · Tailwind] -->|REST + JWT| F[Flask API]
+    V <-->|Socket.IO| WS[Flask-SocketIO]
+    F --> MS[MatchingService]
+    MS --> G[Gemini embeddings]
+    MS --> CS[Cosine similarity<br/>NumPy]
+    F --> PS[Pod / Invitation / Message services]
+    PS --> DB[(MongoDB)]
+    MS --> DB
+    WS --> DB
+```
 
 ## How it works
 
